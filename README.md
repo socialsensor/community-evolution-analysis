@@ -16,8 +16,8 @@ The crawler returns a _testnet.txt.0_ file which should be renamed to _increasin
 Any new data to be analysed should be placed in the _../data/_ folder replacing the _1.txt_ file.  
 The matlab code consists of 7 files which can either work as standalone scripts, or as functions of the _main.m_ script.  
 The only thing that needs changing is a comment of the function line in each of the m-files (instructions are included in the m-files).  
-These 7 files are:  
-    step1\_mentioning\_frequency.m
+These 7 files are:
+<code>step1\_mentioning\_frequency.m</code>
 	- This .m file extracts the user activity in respect to twitter mentions  
     step2\_dyn_adj\_mat_wr.m
 	- This .m file extracts the dynamic adjacency matrices for each respective timeslot and save it into a mat format for use with the rest of the code but also in a csv gephi-ready format.
