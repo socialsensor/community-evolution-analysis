@@ -26,8 +26,8 @@ step3_comm_detect_louvain.m
 	2008(10):P10008 (12pp), 2008.).
 step4_comm_evol_detect.m
 	This .m file detects the evolution of the communities between timeslots.
-	step5_commRoutes.m
-	This .m file detects the evolution of the communities between timeslots.
+step5_commRoutes.m
+	This .m file detects the routes created by the evolution of the communities between timeslots.
 step6_commIndivCentrality.m
 	This .m file extracts the user centrality of all adjacency matrices in between timeslots using the pagerank 
 	algorithm.
