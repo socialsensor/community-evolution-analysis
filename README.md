@@ -6,5 +6,5 @@ We make available a Twitter interaction network collector and a set of Matlab sc
 
 The master  branch of this repository contains ongoing matlab and python files which form the current stable version of the framework. The PCI13 branch contains all the code and data needed to replicate the experiments performed in [1].
 
-1. K. Konstandinidis, S. Papadopoulos, Y. Kompatsiaris. "Community Structure, Interaction and Evolution Analysis of Online Social Networks around Real-World Social Phenomena". In Proceedings of PCI 2013, Thessaloniki, Greece (to be presented on September).
+1. K. Konstandinidis, S. Papadopoulos, Y. Kompatsiaris. "Community Structure, Interaction and Evolution Analysis of Online Social Networks around Real-World Social Phenomena". In Proceedings of PCI 2013, Thessaloniki, Greece (to be presented in September).
 2. V. Blondel, J.-L. Guillaume, R. Lambiotte, E. Lefebvre. "Fast unfolding of communities in large networks". In Journal of Statistical Mechanics: Theory and Experiment (10), P10008, 2008
