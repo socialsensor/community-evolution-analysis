@@ -10,7 +10,7 @@ In order to retrieve the full json of the tweet type:
 
     java -jar retriever.jar --mentionet testnet.txt --keywords keywords.txt -file rawmetadata.json 
 
-The crawler returns a _testnet.txt.0_ file which should be renamed to _increasing number.txt_ as well as have all the +0000 from the timestamps removed in order to perform the analysis using the matlab files.
+The crawler returns a _testnet.txt.0_ file which should be renamed to _increasing\_number.txt_ as well as have all the +0000 from the timestamps removed in order to perform the analysis using the matlab files.
 
 ##Evolution analysis (Matlab)##
 Any new data to be analysed should be placed in the _../data/_ folder replacing the _1.txt_ file.  
@@ -36,5 +36,5 @@ There are also 4 assistive functions which are used to extract the position of e
 
 ###Results###
 The final outcome is a cell array in ../signifComms.mat containing the most significant dynamic communities, their users and the centrality of the users.
-_.../commEvol.mat_ and _.../commEvolSize_ are also useful as they present the evolution of the communities and the community sizes respectfully.
-A heatmap presenting the evolution and size of all evolving communities is also produced giving the user an idea of the bigger picture (_.../images/_).
+_.../commEvol.mat_ and _.../commEvolSize.mat_ are also useful as they present the evolution of the communities and the community sizes respectfully.
+A heatmap presenting the evolution and size of all evolving communities is also produced giving the user an idea of the bigger picture.
