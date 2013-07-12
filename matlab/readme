@@ -4,8 +4,7 @@ Greece, to appear.
 Due to Twitter's terms and permissions (https://dev.twitter.com/terms/api-terms), the data in the files regarding 
 the paper has been transformed from a <authorname mentionedname1,mentionedname2,... "time" text>  form, 
 to a <authorID mentioneID1,mentionedID2,... "time">  form,so unfortunately the content of the tweets is not available. 
-The crawler however still returns data in the original form so working on a new dataset is possible. The data to 
-reproduce the experiments can be retrieved from the 
+The data to reproduce the experiments can be retrieved from the 
 http://www.socialsensor.eu/results/software/82-twitter-dataset-pci2013 site.
 %%%
 %%%Evolution analysis (Matlab)%%%
