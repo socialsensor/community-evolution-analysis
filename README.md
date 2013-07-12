@@ -3,16 +3,19 @@ Code and data for paper: K. Konstantinidis, S. Papadopoulos and Y. Kompatsiaris,
 ###Abstract###
 In recent years, Online Social Networks (OSNs) have been widely adopted by people around the globe as a means of real-time communication and opinion expression. As a result, most real-world events and phenomena are actively discussed online through OSNs such as Twitter and Facebook. However, the scale and variety of such discussions often hampers their objective analysis, e.g. by focusing on specific messages and ignoring the overall picture of a phenomenon. To this end, this paper presents an analysis framework to assist the study of trends, events and interactions performed between online communities. The framework utilizes an adaptive dynamic community detection technique based on the Louvain method to study the evolution, overlap and cross-community dynamics in irregular, dynamically selected graph snapshots. We apply the proposed framework on a Twitter dataset collected by monitoring discussions around tweets containing extreme right political vocabulary, including messages around the Greek Golden Dawn party. The proposed analysis enables the extraction of new insights with respect to influential user accounts, topics of discussion and emerging trends, which could assist the work of journalists, social and political analysis scientists, but also highlights the limitations of existing analysis methods and poses new research questions.
 
-This distribution contains the following:
-a readme.txt file with instructions on how to use the different parts of the framework;
-a data collector (in the /crawler folder) that makes use of the Twitter Streaming API to collect mention networks between Twitter users;
-a set of Matlab scripts (in the /matlab folder) that are used to conduct the different network analysis steps described in [1];
-the set of data used in [1] (anonymized due to Twitter terms of service).
-
 In case you use this implementation in your research, please cite [1].
 
 1. K. Konstandinidis, S. Papadopoulos, Y. Kompatsiaris. "Community Structure, Interaction and Evolution Analysis of Online Social Networks around Real-World Social Phenomena". In Proceedings of PCI 2013, Thessaloniki, Greece (to be presented in September).
-2. V. Blondel, J.-L. Guillaume, R. Lambiotte, E. Lefebvre. "Fast unfolding of communities in large networks". In Journal of Statistical Mechanics: Theory and Experiment (10), P10008, 2008
+2. V. Blondel, J.-L. Guillaume, R. Lambiotte, E. Lefebvre. "Fast unfolding of communities in large networks". In Journal of Statistical Mechanics: Theory and Experiment (10), P10008, 2008.
+
+##Distribution Information##
+This distribution contains the following:  
+* a readme.txt file with instructions on how to use the different parts of the framework;
+* a data collector (in the /crawler folder) that makes use of the Twitter Streaming API to collect mention networks between Twitter users;
+* a set of Matlab scripts (in the /matlab folder) that are used to conduct the different network analysis steps described in [1];
+the set of data used in [1] (anonymized due to Twitter terms of service).
+
+
 ##Data##
 Due to Twitter's terms and permissions (https://dev.twitter.com/terms/api-terms), the data in the files regarding the paper has been transformed from a:  
 _"authorname mentionedname1,mentionedname2,... time text"_  form, to a:  
@@ -51,7 +54,7 @@ These 7 files are:
 
 There are also 4 assistive functions which are used to extract the position of each user in the adjacency matrix (_pos\_aloc\_of\_\usrs.m_), to create the adjacency matrix (_adj\_mat\_creator.m_), to perform the community detection (_comm\_detect\_louvain.m_) and to extract the centrality of each user using the pagerank algorithm (_mypagerank.m_).
 
-###Results###
+##Results##
 The final outcome is a cell array in ../signifComms.mat containing the most significant dynamic communities, their users and the centrality of the users.
 _.../commEvol.mat_ and _.../commEvolSize.mat_ are also useful as they present the evolution of the communities and the community sizes respectfully.
 A heatmap presenting the evolution and size of all evolving communities is also produced giving the user an idea of the bigger picture.
