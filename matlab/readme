@@ -7,8 +7,8 @@ to a <authorID mentioneID1,mentionedID2,... "time">  form,so unfortunately the c
 The crawler however still returns data in the original form so working on a new dataset is possible. The data to 
 reproduce the experiments can be retrieved from the 
 http://www.socialsensor.eu/results/software/82-twitter-dataset-pci2013 site.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Evolution analysis (Matlab)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%%Evolution analysis (Matlab)%%%
 Any new data to be analysed should be placed in the ../data/ folder replacing the <1.txt> file.
 The matlab code consists of 7 files which can either work as standalone scripts, or as functions of the main.m script. 
 The only thing that needs changing is a comment of the function line in each of the m-files (instructions are included 
@@ -38,7 +38,7 @@ step7_commRouteAnal.m
 There are also 4 assistive functions which are used to extract the position of each user in the adjacency matrix 
 (pos_aloc_of_usrs.m), to create the adjacency matrix (adj_mat_creator.m), to perform the community detection 
 (comm_detect_louvain.m) and to extract the centrality of each user using the pagerank algorithm (mypagerank.m).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
 The final outcome is a cell array in ../signifComms.mat containing the most significant dynamic communities, their users
 and the centrality of the users.
 .../commEvol.mat and .../commEvolSize are also useful are they present the evolution of the communities and the community
