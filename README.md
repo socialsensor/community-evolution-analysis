@@ -1,11 +1,11 @@
+#PCI13#
 Code and data for paper: K. Konstantinidis, S. Papadopoulos and Y. Kompatsiaris, (2013) "Community Structure, Interaction and Evolution Analysis of Online Social Networks around Real-World Social Phenomena", PCI 2013, Thessaloniki, Greece, to appear.
 Due to Twitter's terms and permissions (https://dev.twitter.com/terms/api-terms), the data in the files regarding the paper has been transformed from a <authorname mentionedname1,mentionedname2,... "time" text>  form, to a <authorID mentioneID1,mentionedID2,... "time">  form,so unfortunately the content of the tweets is not available. The crawler however still returns data in the original form so working on a new dataset is possible.
 
-%%% Crawler%%%
-
+##Crawler#
 The crawling is done though a jar file in the crawler folder using the following command in the command prompt:
 
-<java -jar retriever.jar --mentionet testnet.txt --keywords keywords.txt>
+'java -jar retriever.jar --mentionet testnet.txt --keywords keywords.txt'
 
 In order to retrieve the full json of the tweet type:
 
