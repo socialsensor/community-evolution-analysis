@@ -17,21 +17,21 @@ Any new data to be analysed should be placed in the ../data/ folder replacing th
 The matlab code consists of 7 files which can either work as standalone scripts, or as functions of the main.m script.  
 The only thing that needs changing is a comment of the function line in each of the m-files (instructions are included in the m-files).  
 These 7 files are:  
-step1_mentioning_frequency.m
-	*This .m file extracts the user activity in respect to twitter mentions
-step2_dyn_adj_mat_wr.m
-	*This .m file extracts the dynamic adjacency matrices for each respective timeslot and save it into a mat format for use with the rest of the code but also in a csv gephi-ready format.
-step3_comm_detect_louvain.m
-	*This .m file detects the communities in each adjacency matrix as well as the sizes of the 	communities and the modularity for each timeslot using Louvain mentod (V. D. Blondel, J.-L. 	Guillaume, R. Lambiotte, and E. Lefebvre. Fast unfolding of communities in large networks. Journal of Statistical Mechanics: Theory and Experiment, 2008(10):P10008 (12pp), 2008.).
-step4_comm_evol_detect.m
-	*This .m file detects the evolution of the communities between timeslots.
-step5_commRoutes.m
-	*This .m file detects the routes created by the evolution of the communities between timeslots.
-step6_commIndivCentrality.m
-	*This .m file extracts the user centrality of all adjacency matrices in between timeslots using the pagerank algorithm.
-step7_commRouteAnal.m
-	*This .m file provides an analysis of the communities in respect to their evolution in terms of 	persistence, stability and user centrality.
-	
+step1_mentioning_frequency.m  
+	* This .m file extracts the user activity in respect to twitter mentions
+step2_dyn_adj_mat_wr.m  
+	* This .m file extracts the dynamic adjacency matrices for each respective timeslot and save it into a mat format for use with the rest of the code but also in a csv gephi-ready format.
+step3_comm_detect_louvain.m  
+	* This .m file detects the communities in each adjacency matrix as well as the sizes of the 	communities and the modularity for each timeslot using Louvain mentod (V. D. Blondel, J.-L. 	Guillaume, R. Lambiotte, and E. Lefebvre. Fast unfolding of communities in large networks. Journal of Statistical Mechanics: Theory and Experiment, 2008(10):P10008 (12pp), 2008.).
+step4_comm_evol_detect.m  
+	* This .m file detects the evolution of the communities between timeslots.
+step5_commRoutes.m  
+	* This .m file detects the routes created by the evolution of the communities between timeslots.
+step6_commIndivCentrality.m  
+	* This .m file extracts the user centrality of all adjacency matrices in between timeslots using the pagerank algorithm.
+step7_commRouteAnal.m  
+	* This .m file provides an analysis of the communities in respect to their evolution in terms of persistence, stability and user centrality.
+
 There are also 4 assistive functions which are used to extract the position of each user in the adjacency matrix (pos_aloc_of_usrs.m), to create the adjacency matrix (adj_mat_creator.m), to perform the community detection (comm_detect_louvain.m) and to extract the centrality of each user using the pagerank algorithm (mypagerank.m).
 
 ###Results###
