@@ -13,7 +13,7 @@ This distribution contains the following:
 * a readme.txt file with instructions on how to use the different parts of the framework;
 * a data collector (in the /crawler folder) that makes use of the Twitter Streaming API to collect mention networks between Twitter users;
 * a set of Matlab scripts (in the /matlab folder) that are used to conduct the different network analysis steps described in [1];
-the set of data used in [1] (anonymized due to Twitter terms of service).
+* the set of data used in [1] (anonymized due to Twitter terms of service).
 
 
 ##Data##
