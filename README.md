@@ -22,7 +22,9 @@ Due to Twitter's terms and permissions (https://dev.twitter.com/terms/api-terms)
 _"authorname mentionedname1,mentionedname2,... time text"_  form, to a:  
 _"authorID mentionedID1,mentionedID2,... time"_  form.  
 So unfortunately the content of the tweets is not available. The crawler however still returns data in the original form so working on a new dataset is possible.
+
 ##Crawler##
+Before using the crawler, the user should go on dev.twitter.com, set up an account and create a new application. S/he should then acquire the _Consumer key_, the _Consumer secret_, _Access token_ and the _Access token secret_ which should be manually inserted into the ../crawler/_crawl.xml_ file.  
 The crawling is done though a _jar_ file in the crawler folder using the following command in the command prompt:
 
     java -jar retriever.jar --mentionet testnet.txt --keywords keywords.txt
@@ -33,6 +35,7 @@ In order to retrieve the full json of the tweet type:
 
 The crawler returns a _testnet.txt.0_ file which should be renamed to _increasing\_number.txt_ as well as have all the +0000 from the timestamps removed in order to perform the analysis using the matlab files.
 The txt files should then be added in the _../data/_ folder
+
 ##Evolution analysis (Matlab)##
 Any new data to be analysed should be placed in the _../data/_ folder replacing the _1.txt_ file.  
 The matlab code consists of 7 files which can either work as standalone scripts, or as functions of the _main.m_ script.  
