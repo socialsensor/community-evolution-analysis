@@ -24,7 +24,7 @@ _"authorID mentionedID1,mentionedID2,... time"_  form.
 So unfortunately the content of the tweets is not available. The crawler however still returns data in the original form so working on a new dataset is possible.
 
 ##Crawler##
-Before using the crawler, the user should go on dev.twitter.com, set up an account and create a new application. S/he should then acquire the _Consumer key_, the _Consumer secret_, _Access token_ and the _Access token secret_ which should be manually inserted into the ../crawler/_crawl.xml_ file.  
+Before using the crawler, the user should go on (dev.twitter.com)[http://dev.twitter.com], set up an account and create a new application. S/he should then acquire the _Consumer key_, the _Consumer secret_, _Access token_ and the _Access token secret_ which should be manually inserted into the _../crawler/crawl.xml_ file.  
 The crawling is done though a _jar_ file in the crawler folder using the following command in the command prompt:
 
     java -jar retriever.jar --mentionet testnet.txt --keywords keywords.txt
