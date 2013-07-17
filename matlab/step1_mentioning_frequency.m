@@ -15,11 +15,11 @@
 % A time sampling interval of 43200secs was selected for the PCI13 dataset%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% function timeSeg=step1_mentioning_frequency(folder_name,show_plots) %%Comment this line if you need the script
+function timeSeg=step1_mentioning_frequency(folder_name,show_plots) %%Comment this line if you need the script
 %%%%%%%%%%%%%%
 % standalone script %%comment the following two lines if you need the fn
-folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
-show_plots=1; %set show_plots to 0 if the plots are not to be shown
+%folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
+%show_plots=1; %set show_plots to 0 if the plots are not to be shown
 %%%%%%%%%%%%%%
 mkdir([folder_name,'\data\mats']);mkdir([folder_name,'\data\txts']);
 dbstop if error
