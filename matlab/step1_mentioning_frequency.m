@@ -23,7 +23,7 @@ function timeSeg=step1_mentioning_frequency(folder_name,show_plots) %%Comment th
 %%%%%%%%%%%%%%
 mkdir([folder_name,'\data\mats']);mkdir([folder_name,'\data\txts']);
 dbstop if error
-lenDir=length(dir([folder_name,'\txts\*.txt'])); %number of txt files in the folder
+lenDir=length(dir([folder_name,'\data\*.txt'])); %number of txt files in the folder
 if lenDir>1 %if the data is contained in multiple files
     templA=1;
     for txtfile=1:lenDir
