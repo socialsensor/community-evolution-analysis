@@ -15,11 +15,11 @@
 % A time sampling interval of 43200secs was selected for the PCI13 dataset%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function timeSeg=step1_mentioning_frequency(folder_name,show_plots) %%Comment this line if you need the script
+% function timeSeg=step1_mentioning_frequency(folder_name,show_plots) %%Comment this line if you need the script
 %%%%%%%%%%%%%%
 % standalone script %%comment the following two lines if you need the fn
-% folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
-% show_plots=1; %set show_plots to 0 if the plots are not to be shown
+folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
+show_plots=1; %set show_plots to 0 if the plots are not to be shown
 %%%%%%%%%%%%%%
 mkdir([folder_name,'\data\mats']);mkdir([folder_name,'\data\txts']);
 dbstop if error
@@ -28,17 +28,17 @@ if lenDir>1 %if the data is contained in multiple files
     templA=1;
     for txtfile=1:lenDir
         fid = fopen([folder_name,'\data\',num2str(txtfile),'.txt']);
-        C = textscan(fid,'%s %s %q %*[^\n]', 'CollectOutput');
+        C = textscan(fid,'%*s %*s %q %*[^\n]', 'CollectOutput');
         fclose(fid);
-        lngth=length(C{3})+templA-1;
-        time(templA:lngth,1)=C{3};
+        lngth=length(C{1})+templA-1;
+        time(templA:lngth,1)=C{1};
         templA=length(time)+1;
     end
 else
     fid = fopen([folder_name,'\data\1.txt']); %if the data is contained in a single file
-    C = textscan(fid,'%s %s %q %*[^\n]', 'CollectOutput');
+    C = textscan(fid,'%*s %*s %q %*[^\n]', 'CollectOutput');
     fclose(fid);
-    time=C{3};
+    time=C{1};
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %extract time vectors from the time stamps
