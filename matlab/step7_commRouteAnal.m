@@ -7,8 +7,9 @@
 % A heatmap presenting the evolution and size of all evolving communities %
 % is produced giving an idea of the bigger picture.                       %
 % It can either work as a standalone script or as a function for the main %
-% m-file                                                                  %
-% Please comment the function lines below accordingly                     %
+% m-file.                                                                 %
+% Please comment the function lines below accordingly.                    %
+% The results are saved in the ../data/mats/timeSeg_yourchoice/ folder.   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function signifComms=step7_commRouteAnal(folder_name,timeSeg,top) %%Comment this line if you need the script
@@ -31,27 +32,27 @@ commEvol=zeros(siz,length(uniCommIds));
 commEvolOnes=zeros(siz,length(uniCommIds));
 commEvol=num2cell(commEvol);
 commEvolSize=zeros(siz,length(uniCommIds));
-commEvolCentr=zeros(siz,length(uniCommIds));
+usrEvolCentr=zeros(siz,length(uniCommIds));
 for i=1:length(uniCommIds)
     [a,b]=find(strcmp(uniCommIds{i},commIds));
     for k=1:length(a)
         commEvolOnes(a(k),i)=1;
         commEvol{a(k),i}=uniCommIds{i};
         commEvolSize(a(k),i)=commSize(a(k),b(k));
-        commEvolCentr(a(k),i)=max(usrCentrMax{a(k),b(k)});
+        usrEvolCentr(a(k),i)=max(usrCentrMax{a(k),b(k)});
     end
 end
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commEvol.mat'],'commEvol');
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commEvolSize.mat'],'commEvolSize');
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commEvolOnes.mat'],'commEvolOnes');
-save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commEvolCentr.mat'],'commEvolCentr');
+save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\usrEvolCentr.mat'],'usrEvolCentr');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commEvol.mat'],'commEvol');
 % load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commEvolSize.mat'],'commEvolSize');
 % load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commEvolOnes.mat'],'commEvolOnes');
-% load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commEvolCentr.mat'],'commEvolCentr');
+% load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\usrEvolCentr.mat'],'usrEvolCentr');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[evols,w]=size(commEvolOnes);
+[~,w]=size(commEvolOnes);
 %%%%%persistence
 prsistc=sum(commEvolOnes);%/h;
 prsistc=prsistc/max(prsistc);
@@ -66,7 +67,7 @@ for i=1:size(commEvolOnes,2)
 end
 stblt=stblt/max(stblt);
 %%%%%centrality
-cntrlity=sum(commEvolCentr);
+cntrlity=sum(usrEvolCentr);
 cntrlity=cntrlity/max(cntrlity);
 %%%%%most significant evolutional comms
 frstTry=stblt.*prsistc.*cntrlity;
@@ -82,6 +83,7 @@ for i=1:top
         signifComms{i,k}(:,2)=tmp;
     end
 end
+%As well as returning the most significant Comms in the workspace, we also save them in the ../data/mats/timeSeg_yourchoice/ folder. 
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\signifComms.mat'],'signifComms')
 %The last part produces a heatmap presenting the evolution and size of all evolving communities.
 figure

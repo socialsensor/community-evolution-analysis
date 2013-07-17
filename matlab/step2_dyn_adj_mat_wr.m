@@ -56,7 +56,7 @@ for k=1:length(mentionLimit)
         authors=tempUsers(authIdx);
         mentioned=tempUsers(mentIdx);
         %save csvs of all the dynamic adjacency matrices in gephi-ready
-        %form (the numbers correspond to the various POIs)
+        %form (the file name numbers correspond to the various POIs)
         fid = fopen([folder_name,'\data\txts\adjMats\timeSeg_',num2str(timeSeg),'\',num2str(k),'.csv'],'w');
         fprintf(fid,'%s\n','Source,Target,Weight');
         for row=1:length(authIdx);

@@ -4,7 +4,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This .m file extracts the user activity in respect to twitter mentions. %
 % It can either work as a standalone script or as a function for the main %
-% m-file                                                                  %
+% m-file.                                                                 %
+% The parall variable should be set to 1 if the parallel computing toolbox%
+% is available and to 0 if it's not.									  %
 % Please comment the function line below accordingly                      %
 % The data to be analysed is in the ../data folder                        %
 % If there are more than one txt files in the ../data folder containing   %
@@ -15,12 +17,15 @@
 % A time sampling interval of 43200secs was selected for the PCI13 dataset%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function timeSeg=step1_mentioning_frequency(folder_name,show_plots) %%Comment this line if you need the script
+function timeSeg=step1_mentioning_frequency(folder_name,show_plots,parall) %%Comment this line if you need the script
 %%%%%%%%%%%%%%
-% standalone script %%comment the following two lines if you need the fn
-%folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
-%show_plots=1; %set show_plots to 0 if the plots are not to be shown
+myOptions={'Yes' 'No'};
+%%% standalone script %%comment the following two lines if you need the fn
+%older_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
+%parall = menu('Parallel processing toolbox available?',myOptions);
+%show_plots = menu('Would you like to see the activity plots?',myOptions);
 %%%%%%%%%%%%%%
+pci13= menu('Are you running the PCI13 dataset?',myOptions);
 mkdir([folder_name,'\data\mats']);mkdir([folder_name,'\data\txts']);
 dbstop if error
 lenDir=length(dir([folder_name,'\data\*.txt'])); %number of txt files in the folder
@@ -44,14 +49,20 @@ end
 %extract time vectors from the time stamps
 lT=length(time);
 datetime=cell(lT,1);
-if ~matlabpool('size')
-    matlabpool open
+if parall==1
+    if ~matlabpool('size')
+        matlabpool open
+    end
+    parfor xa=1:lT
+        datetime{xa}=datevec(time{xa},'ddd mmm dd HH:MM:SS yyyy');
+    end
+else
+    datetime=(cellfun(@(x)datevec(x, 'ddd mmm dd HH:MM:SS yyyy'), time,'uni',false));
 end
-parfor xa=1:lT
-    datetime{xa}=datevec(time{xa},'ddd mmm dd HH:MM:SS yyyy')
+if matlabpool('size')
+    matlabpool close
 end
 clear time
-matlabpool close
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 timeDif=single(zeros(lT,1)); timeini=datetime{1,:};
 timeSegCopy=[600 1800 3600 21600 43200 86400];
@@ -110,18 +121,20 @@ if show_plots==1
     maxDateinSecs=max(timeSeg)*realDays;
     %The following dates only apply to the PCI13 dataset. Comment for
     %different datasets.
-    dates=cell(realDays,1);
-    for k=1:4:25
-        dates{k,1}=[num2str(k+3),'/02'];
-    end
-    for k=29:4:56
-        dates{k,1}=[num2str(k-25),'/03'];
-    end
-    for k=57:4:86
-        dates{k,1}=[num2str(k-56),'/04'];
-    end
-    for k=87:4:93
-        dates{k,1}=[num2str(k-86),'/05'];
+    if pci13==1
+        dates=cell(realDays,1);
+        for k=1:4:25
+            dates{k,1}=[num2str(k+3),'/02'];
+        end
+        for k=29:4:56
+            dates{k,1}=[num2str(k-25),'/03'];
+        end
+        for k=57:4:86
+            dates{k,1}=[num2str(k-56),'/04'];
+        end
+        for k=87:4:93
+            dates{k,1}=[num2str(k-86),'/05'];
+        end
     end
     figure;
     for i=1:length(timeSeg)
@@ -135,11 +148,18 @@ if show_plots==1
             end
         end
         hold on
-        subplot(3,1,j), plot(freqStat), xlabel('Date'), ylabel(['User Activity (#tweets/',num2str(timeSeg(i)/3600),')']), xlim([1 maxDateinSecs/timeSeg(i)]);
-        set(gca,'Xtick',1:max(timeSeg)/timeSeg(i):maxDateinSecs/timeSeg(i),'XTickLabel',dates,'XGrid','on');
-        hold
-        subplot(3,1,j), plot(POI,freqStat(POI),'ro'), xlim([0 maxDateinSecs/timeSeg(i)]);
-        hold off
+        if pci13==1
+            subplot(3,1,j), plot(freqStat), xlabel('Date'), ylabel(['User Activity (#tweets/',num2str(timeSeg(i)/3600),')']), xlim([1 maxDateinSecs/timeSeg(i)]);
+            set(gca,'Xtick',1:max(timeSeg)/timeSeg(i):maxDateinSecs/timeSeg(i),'XTickLabel',dates,'XGrid','on');
+            hold
+            subplot(3,1,j), plot(POI,freqStat(POI),'ro'), xlim([0 maxDateinSecs/timeSeg(i)]);
+            hold off
+        else
+            subplot(3,1,j), plot(freqStat), xlabel('Date'), ylabel(['User Activity (#tweets/',num2str(timeSeg(i)/3600),')']);
+            hold
+            subplot(3,1,j), plot(POI,freqStat(POI),'ro');
+            hold off
+        end
     end
 end
 timeSeg={600 1800 3600 21600 43200 86400}; %Snapshot every timeSeg secs

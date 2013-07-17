@@ -34,8 +34,7 @@ load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numMaxCommSimPercenta
 load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commSizes.mat'],'commSizes');
 mrgCount=0;splCount=0;birthCount=0;
 bin=0;
-for i=2:lDir
-    
+for i=2:lDir    
     for j=1:lC(i)
         tempcommSize=commSizes{i,j};
         if tempcommSize>999

@@ -8,20 +8,24 @@
 % Please comment the function lines below accordingly                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function step4_comm_evol_detect(folder_name,timeSeg) %%Comment this line if you need the script
+function step4_comm_evol_detect(folder_name,timeSeg,parall) %%Comment this line if you need the script
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%stand alone script %%comment the following 4 lines if you need the fn
+%stand alone script %%comment the following 6 lines if you need the fn
 % folder_name=uigetdir; %%select the directory of interest
 % timeSegCopy={600 1800 3600 21600 43200 86400}; %Snapshot every so many secs
 % choice = menu('Please select sampling rate...',timeSegCopy);
 % timeSeg=timeSegCopy{choice};
+% myOptions={'Yes' 'No'};
+% parall = menu('Parallel processing toolbox available?',myOptions);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 CommDir=dir([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strComms*.mat']);
 lDir=length(CommDir);
-if ~matlabpool('size')
-    matlabpool open
+if parall==1
+    if ~matlabpool('size')
+        matlabpool open
+    end
 end
-% In order to test different thresholds run the following section once and then comment 
+% In order to test different thresholds run the following section once and then comment
 % and uncomment the loads below
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 numCommBags=cell(lDir,1);
@@ -39,9 +43,16 @@ uniqueUsers=uniqueUsers;
 for i=1:lDir
     load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strComms',num2str(i),'.mat'],'strComms');
     strComms=strComms;
-    parfor k=1:lC(i)
-        [~,tempnumbags]=ismember(strComms{k},uniqueUsers);
-        numCommBags{i,k}=tempnumbags;
+    if parall==1
+        parfor k=1:lC(i)
+            [~,tempnumbags]=ismember(strComms{k},uniqueUsers);
+            numCommBags{i,k}=tempnumbags;
+        end
+    else
+        for k=1:lC(i)
+            [~,tempnumbags]=ismember(strComms{k},uniqueUsers);
+            numCommBags{i,k}=tempnumbags;
+        end
     end
     strCommBags(i,1:lC(i))=strComms(1:lC(i));
 end
@@ -74,8 +85,14 @@ for i=2:lDir
             l=i-ltmemp;
             if l>0
                 templC=lC(l);
-                parfor k=1:templC
-                    mytemp(l,k)=(sum(ismember(bag1,numCommBags{l,k})))/numel(union(bag1,numCommBags{l,k}));
+                if parall==1
+                    parfor k=1:templC
+                        mytemp(l,k)=(sum(ismember(bag1,numCommBags{l,k})))/numel(union(bag1,numCommBags{l,k}));
+                    end
+                else
+                    for k=1:templC
+                        mytemp(l,k)=(sum(ismember(bag1,numCommBags{l,k})))/numel(union(bag1,numCommBags{l,k}));
+                    end
                 end
                 %%if a similar community is detected in previous timeslots, the search continues to the next community
                 if max(mytemp(l,:))>=thres
@@ -89,7 +106,9 @@ for i=2:lDir
 end
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numMaxLike_back_jacc.mat'],'maxLike');
 %find maximum similarity between communities to speed up the process
-matlabpool close
+if matlabpool('size')
+    matlabpool close
+end
 maxCommSimPercentage=zeros((lDir),max(lC));
 for i=1:(lDir)
     for j=1:max(lC)

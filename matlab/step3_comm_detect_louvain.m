@@ -15,14 +15,16 @@
 % Please comment the function lines below accordingly                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function step3_comm_detect_louvain(folder_name,recursive,timeSeg)
+function step3_comm_detect_louvain(folder_name,recursive,timeSeg,parall) %%Comment this line if you need the script
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%stand alone script %%comment the following 5 lines if you need the fn
+%stand alone script %%comment the following 7 lines if you need the fn
 % recursive=0;
 % folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
 % timeSegCopy={600 1800 3600 21600 43200 86400}; %Snapshot every so many secs
-% choice = menu('Please select sampling rate...',timeSegCopy); 
+% choice = menu('Please select sampling rate...',timeSegCopy);
 % timeSeg=timeSegCopy{choice};
+% myOptions={'Yes' 'No'};
+% parall = menu('Parallel processing toolbox available?',myOptions);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 mkdir(folder_name,['\data\mats\timeSeg_',num2str(timeSeg)]);
 CommDir=dir([folder_name,'\data\mats\adjMats\timeSeg_',num2str(timeSeg),'\adjMat*.mat']);
@@ -35,19 +37,29 @@ for k=1:lDir
     load([folder_name,'\data\mats\adjMats\timeSeg_',num2str(timeSeg),'\adjMat_',num2str(k),'.mat']);
     cellAdjMat{k,1}=adjMat;
 end
-if ~matlabpool('size')
-matlabpool open
-end
 commStructure=cell(lDir,1);
 % detect communities for each timeslot
-parfor k2=1:lDir
-    [comm_struct,~] = comm_detect_louvain(cellAdjMat{k2},recursive,0,0,0);
-    mymodularity(k2)=comm_struct.MOD;
-    commStructure{k2}=comm_struct;
+if parall==1
+    if ~matlabpool('size')
+        matlabpool open
+    end
+    parfor k2=1:lDir
+        [comm_struct,~] = comm_detect_louvain(cellAdjMat{k2},recursive,0,0,0);
+        mymodularity(k2)=comm_struct.MOD;
+        commStructure{k2}=comm_struct;
+    end
+else
+    for k2=1:lDir
+        [comm_struct,~] = comm_detect_louvain(cellAdjMat{k2},recursive,0,0,0);
+        mymodularity(k2)=comm_struct.MOD;
+        commStructure{k2}=comm_struct;
+    end
+end
+if matlabpool('size')
+    matlabpool close
 end
 % save the structure resulting from the louvain code for all timeslots
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commStructure.mat'],'commStructure');
-matlabpool close
 for k=1:lDir
     comm_struct=commStructure{k};
     commSizes(k,1:length(comm_struct.SIZE{1}))=num2cell(comm_struct.SIZE{1});
