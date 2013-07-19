@@ -11,14 +11,19 @@ import json
 import codecs
 import os,glob
 import csv
+import wx
+#User selects folder
+app = wx.PySimpleApp()
+userPath = 'F:/Dropbox/ÉÐÔÇË/MATLAB'
+dialog = wx.DirDialog(None, "Please select your dataset folder:",defaultPath=userPath)
+if dialog.ShowModal() == wx.ID_OK:
+    folder_path= dialog.GetPath()
+dialog.Destroy()
 
-!!! Must create a user input asking for the path of the folder in interest
-
-with open("C:\\Python27\\my_python_scripts\\uniqueUsers.csv") as uniUsrs:
+with open(folder_path+"\\uniqueUsers.csv") as uniUsrs:
     usrDic=[line.split(" ") for line in uniUsrs]
 usrDic = dict((word, int(cnt)) for (word, cnt) in usrDic)
-##my_txt=open("C:\\Python27\\my_python_scripts\\retweetList.csv","w")
-for filename in glob.glob("D:\\test_jsons/*.json"):
+for filename in glob.glob(folder_path+"/*.json"):
     print(filename)
     my_file=open(filename,"r")
     read_line=my_file.readline()
