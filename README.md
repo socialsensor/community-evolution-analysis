@@ -13,7 +13,7 @@ In case you use this implementation in your research, please cite [1].
 This distribution contains the following:  
 * a readme.txt file with instructions on how to use the different parts of the framework;
 * a data collector (in the /crawler folder) that makes use of the Twitter Streaming API to collect mention networks between Twitter users;
-* a set of Python scripts (in the /python folder) that are used to parse the json files retrieved by the data collector in a \"Matlab friendly\" form.
+* a set of Python scripts (in the /python folder) that are used to parse the json files retrieved by the data collector in a "Matlab friendly" form.
 * a set of Matlab scripts (in the /matlab folder) that are used to conduct the different network analysis steps described in [1];
 * the set of data used in \[1] (anonymized due to Twitter terms of service).
 
@@ -39,27 +39,28 @@ The txt files should then be added in the _../data/_ folder
 
 ##json Parsing (Python)##
 The python code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with the jsons extracted from the crawler and 4 files to be used with jsons from any other Twitter API dependant source.  
-More specifically, they are used to create txt files which contain the mentions entries between twitter users as well as the time at which these mentiones were made and the context in which they were included.  
+More specifically, they are used to create txt files which contain the mentions entries between twitter users as well as the time at which these mentions were made and the context in which they were included.  
 
 The json_mention_141_multifile* files provide as many txt files as there are json files. 
 They contain all the information required from the tweet in a readable form:
+
     user1 \TAB user2,user3... \TAB "created_at_timestamp" \TAB text \newline
 
 The json_mention_matlab_singleFile* files provide a single file which contains only the data
-required to perform the community analysis efficiently. They contain information in a form suitable
-for matlab:
+required to perform the community analysis efficiently. They contain information in a "Matlab friendly" form:
+
     user1 \TAB user2 \TAB unix_timestamp \TAB \newline
     user1 \TAB user3 \TAB unix_timestamp \TAB \newline
 
 This folder contains 8 files:
 
-* <code>json_mention_141_multifile_crawler.py & json_mention_matlab_singleFile_crawler.py</code>
+* <code>json\_mention\_multifile\_crawler.py & json\_mention\_matlab\_singleFile_crawler.py</code>  
     These .py files is used to parse rawmetadata.json.# files straight from the crawler. (The files should be moved to a new folder before parsing commenses)
-* <code>json_mention_141_multifile_noDialog_crawler.py & json_mention_matlab_singleFile_noDialog_crawler.py</code>
+* <code>json_mention\_multifile\_noDialog_crawler.py & json\_mention\_matlab\_singleFile_noDialog_crawler.py</code>  
     These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
-* <code>json_mention_141_multifile_parser.py & json_mention_matlab_singleFile_parser.py</code>
+* <code>json\_mention\_multifile\_parser.py & json\_mention\_matlab\_singleFile_parser.py</code>  
     These files are used when the user has *.json files from another source.
-* <code>json_mention_141_multifile_noDialog_parser.py & json_mention_matlab_singleFile_noDialog_parser.py</code>
+* <code>json\_mention\_multifile\_noDialog\_parser.py & json\_mention\_matlab\_singleFile\_noDialog_parser.py</code>  
     These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
 	
 ##Evolution analysis (Matlab)##
@@ -77,12 +78,12 @@ These 7 files are:
     This .m file detects the evolution of the communities between timeslots.  
 * <code>step5_commRoutes.m</code>  
     This .m file detects the routes created by the evolution of the communities between timeslots.  
-* <code>step6_commIndivCentrality.m</code>  
+* <code>step6\_commIndivCentrality.m</code>  
     This .m file extracts the user centrality of all adjacency matrices in between timeslots using the pagerank algorithm.  
-* <code>step7_commRouteAnal.m</code>  
+* <code>step7\_commRouteAnal.m</code>  
     This .m file provides an analysis of the communities in respect to their evolution in terms of persistence, stability and user centrality.
 
-There are also 4 assistive functions which are used to extract the position of each user in the adjacency matrix (_pos\_aloc\_of\_\usrs.m_), to create the adjacency matrix (_adj\_mat\_creator.m_), to perform the community detection (_comm\_detect\_louvain.m_) and to extract the centrality of each user using the pagerank algorithm (_mypagerank.m_).
+There are also 4 assistive functions which are used to extract the position of each user in the adjacency matrix (_pos\_aloc\_of\_usrs.m_), to create the adjacency matrix (_adj\_mat\_creator.m_), to perform the community detection (_comm\_detect\_louvain.m_) and to extract the centrality of each user using the pagerank algorithm (_mypagerank.m_).
 
 ##Results##
 The final outcome is a cell array in ../data/mats/signifComms.mat containing the most significant dynamic communities, their users and the centrality of the users.
