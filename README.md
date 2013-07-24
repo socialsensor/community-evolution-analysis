@@ -13,6 +13,7 @@ In case you use this implementation in your research, please cite [1].
 This distribution contains the following:  
 * a readme.txt file with instructions on how to use the different parts of the framework;
 * a data collector (in the /crawler folder) that makes use of the Twitter Streaming API to collect mention networks between Twitter users;
+* a set of Python scripts (in the /python folder) that are used to parse the json files retrieved by the data collector in a \"Matlab friendly\" form.
 * a set of Matlab scripts (in the /matlab folder) that are used to conduct the different network analysis steps described in [1];
 * the set of data used in \[1] (anonymized due to Twitter terms of service).
 
@@ -36,6 +37,31 @@ In order to retrieve the full json of the tweet type:
 The crawler returns a _testnet.txt.0_ file which should be renamed to _increasing\_number.txt_ as well as have all the +0000 from the timestamps removed in order to perform the analysis using the matlab files.
 The txt files should then be added in the _../data/_ folder
 
+##json Parsing (Python)##
+The python code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with the jsons extracted from the crawler and 4 files to be used with jsons from any other Twitter API dependant source.  
+More specifically, they are used to create txt files which contain the mentions entries between twitter users as well as the time at which these mentiones were made and the context in which they were included.  
+
+The json_mention_141_multifile* files provide as many txt files as there are json files. 
+They contain all the information required from the tweet in a readable form:
+    user1 \TAB user2,user3... \TAB "created_at_timestamp" \TAB text \newline
+
+The json_mention_matlab_singleFile* files provide a single file which contains only the data
+required to perform the community analysis efficiently. They contain information in a form suitable
+for matlab:
+    user1 \TAB user2 \TAB unix_timestamp \TAB \newline
+    user1 \TAB user3 \TAB unix_timestamp \TAB \newline
+
+This folder contains 8 files:
+
+* <code>json_mention_141_multifile_crawler.py & json_mention_matlab_singleFile_crawler.py</code>
+    These .py files is used to parse rawmetadata.json.# files straight from the crawler. (The files should be moved to a new folder before parsing commenses)
+* <code>json_mention_141_multifile_noDialog_crawler.py & json_mention_matlab_singleFile_noDialog_crawler.py</code>
+    These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
+* <code>json_mention_141_multifile_parser.py & json_mention_matlab_singleFile_parser.py</code>
+    These files are used when the user has *.json files from another source.
+* <code>json_mention_141_multifile_noDialog_parser.py & json_mention_matlab_singleFile_noDialog_parser.py</code>
+    These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
+	
 ##Evolution analysis (Matlab)##
 Any new data to be analysed should be placed in the _../data/_ folder replacing the _1.txt_ file.  
 The matlab code consists of 7 files which can either work as standalone scripts, or as functions of the _main.m_ script.  
