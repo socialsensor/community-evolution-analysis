@@ -5,7 +5,6 @@ function [posAuthor,posMention,uniqueUsers,tempUsers]=pos_aloc_of_usrs(authors,m
 %this is the fastest position allocator so far
 authors=authors(sesStart:sesEnd);
 mentions=mentions(sesStart:sesEnd);
-clear C
 uniqueMentions=unique(mentions);
 uniqueAuthors=unique(authors);
 uniqueUsers=unique([uniqueUsers;uniqueAuthors;uniqueMentions],'stable');
@@ -13,6 +12,6 @@ tempUsers=unique([uniqueAuthors; uniqueMentions]);
 clear uniqueAuthors uniqueMentions
 
 [~,posAuthor]=ismember(authors,tempUsers);%find position of author in uniquenames
-posAuthor=single(posAuthor);
+% posAuthor=single(posAuthor);
 [~,posMention]=ismember(mentions,tempUsers);%find position of mentions in uniquenames
-posMention=single(posMention);
+% posMention=single(posMention);

@@ -12,33 +12,31 @@ function step5_commRoutes(folder_name,timeSeg) %%Comment this line if you need t
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %stand alone script %%comment the following 4 lines if you need the fn
 % folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
-% timeSegCopy={600 1800 3600 21600 43200 86400}; %Snapshot every so many secs
-% choice = menu('Please select sampling rate...',timeSegCopy); 
-% timeSeg=timeSegCopy{choice};
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% timeSeg=1800; % Change the value of timeSeg in respect to the desired time sampling interval (seconds)
+%%%Sampling time values {600 1800 3600 21600 43200 86400};%%%%%%%%%
 
-load([placeName,'\mats\timeSeg_',num2str(timeSeg),'\commLengths.mat']);
+load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commLengths.mat']);
 lDir=length(lC);                                                                          
 commIds=cell(lDir,max(lC));
 commNums=cell(lDir,max(lC));
 %name first line of communities
-load([placeName,'\mats\timeSeg_',num2str(timeSeg),'\strComms',num2str(1),'.mat']);
+load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strComms',num2str(1),'.mat']);
 for j=1:lC(1);%length(numComms)
     commIds{1,j}=['T',num2str(1),',',num2str(j)];
     commNums{1,j}(1,j)=1;
     commNums{1,j}=sparse(commNums{1,j});
 end
 %do the rest
-load([placeName,'\mats\timeSeg_',num2str(timeSeg),'\numMaxCommSimPercentage_jacc.mat'],'maxCommSimPercentage');
-load([placeName,'\mats\timeSeg_',num2str(timeSeg),'\commSizes.mat'],'commSizes');
+load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numMaxCommSimPercentage_jacc.mat'],'maxCommSimPercentage');
+load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commSizes.mat'],'commSizes');
 mrgCount=0;splCount=0;birthCount=0;
 bin=0;
 for i=2:lDir
-    tic
-    load([placeName,'\mats\timeSeg_',num2str(timeSeg),'\tempmaxLike_',num2str(i),'.mat'],'tempmaxLike');
-    toc
+    
+    load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\tempmaxLike_',num2str(i),'.mat'],'tempmaxLike');
+    
     for j=1:lC(i)
-        tempcommSize=commSizes{i,j};
+        tempcommSize=commSizes(i,j);
         if tempcommSize>999
             thres=.1;
         elseif tempcommSize>99%9
@@ -91,14 +89,14 @@ for i=2:lDir
             birthCount=birthCount+1;
         end
     end
-    toc
+    
 end
 uniCommIds=unique(tempUniCommIds);
 %Save a mat file with all the community Ids
-save([placeName,'\mats\timeSeg_',num2str(timeSeg),'\numEvolCommIds.mat'],'commIds');
+save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numEvolCommIds.mat'],'commIds');
 %Save a mat file with all the respective community Id numbers
-save([placeName,'\mats\timeSeg_',num2str(timeSeg),'\numEvolCommNums.mat'],'commNums');
+save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numEvolCommNums.mat'],'commNums');
 %Save a mat file with a vector containting all the unique community Ids
-save([placeName,'\mats\timeSeg_',num2str(timeSeg),'\numEvolUniCommIds.mat'],'uniCommIds');
+save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numEvolUniCommIds.mat'],'uniCommIds');
 
 

@@ -11,22 +11,20 @@
 % Please comment the function lines below accordingly                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [signifComms,signifComms_sblt,signifComms_prsst,signifComms_commCentr]=step9_commRank_comparison.m(folder_name,timeSeg,top) %%Comment this line if you need the script
+function [sigComms,sigComms_sblt,sigComms_prsst,sigComms_commCentr]=step9_commRank_comparison(folder_name,timeSeg,top) %%Comment this line if you need the script
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%stand alone script %%comment the following 4 lines if you need the fn
-% folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
-% timeSegCopy={600 1800 3600 21600 43200 86400}; %Snapshot every so many secs
-% choice = menu('Please select sampling rate...',timeSegCopy); 
-% timeSeg=timeSegCopy{choice};
+%%%stand alone script %%comment the following 4 lines if you need the fn
+% folder_name=uigetdir;
+% timeSeg=1800; % Change the value of timeSeg in respect to the desired time sampling interval (seconds)
 % top=20;%number of top evolving communities to show
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Sampling time values {600 1800 3600 21600 43200 86400};%%%%%%%%%
 
-tic
-signifComms=commRank_synergy(folder_name,timeSeg,top);
-toc
-signifComms_sblt=commRank_stability(folder_name,timeSeg,top);
-toc
-signifComms_prsst=commRank_persist(folder_name,timeSeg,top);
-toc
-signifComms_commCentr=commRank_commCentr(folder_name,timeSeg,top);
-toc
+
+sigComms=step9_commRank_synergy(folder_name,timeSeg,top);
+
+sigComms_sblt=step9_commRank_stability(folder_name,timeSeg,top);
+
+sigComms_prsst=step9_commRank_persist(folder_name,timeSeg,top);
+
+sigComms_commCentr=step9_commRank_commCentr(folder_name,timeSeg,top);
+
