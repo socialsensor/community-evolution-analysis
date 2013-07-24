@@ -10,62 +10,45 @@
 
 function step4_comm_evol_detect(folder_name,timeSeg,parall) %%Comment this line if you need the script
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%stand alone script %%comment the following 6 lines if you need the fn
-% folder_name=uigetdir; %%select the directory of interest
-% timeSegCopy={600 1800 3600 21600 43200 86400}; %Snapshot every so many secs
-% choice = menu('Please select sampling rate...',timeSegCopy);
-% timeSeg=timeSegCopy{choice};
-% myOptions={'Yes' 'No'};
-% parall = menu('Parallel processing toolbox available?',myOptions);
+%stand alone script %%comment the following 3 lines if you need the fn
+%folder_name=uigetdir; %%select the directory of interest
+%timeSeg=43200; %%{600 1800 3600 21600 43200 86400}; %Change the value of timeSeg in respect to the desired time sampling interval (seconds)
+%parall = 1; %% should be set to 1 if the parallel computing toolbox is available and to 0 if it's not.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 CommDir=dir([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strComms*.mat']);
 lDir=length(CommDir);
-if parall==1
-    if ~matlabpool('size')
-        matlabpool open
-    end
-end
-% In order to test different thresholds run the following section once and then comment
-% and uncomment the loads below
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 numCommBags=cell(lDir,1);
 strCommBags=cell(lDir,1);
 lC=zeros(lDir,1);
 %load communities and make community bags with communities of size 2 and larger
 load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commSizes.mat'],'commSizes');
 for i=1:lDir
-    load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strComms',num2str(i),'.mat']);
-    lC(i)=length(find(cell2mat(commSizes(i,:))>2));
+    lC(i)=length(find(commSizes(i,:)>2));
 end
+maxlC=max(lC);
 clear commSizes
-load([folder_name,'\data\mats\adjMats\timeSeg_',num2str(timeSeg),'\uniqueUsers.mat'],'uniqueUsers');
-uniqueUsers=uniqueUsers;
 for i=1:lDir
     load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strComms',num2str(i),'.mat'],'strComms');
-    strComms=strComms;
-    if parall==1
-        parfor k=1:lC(i)
-            [~,tempnumbags]=ismember(strComms{k},uniqueUsers);
-            numCommBags{i,k}=tempnumbags;
-        end
-    else
-        for k=1:lC(i)
-            [~,tempnumbags]=ismember(strComms{k},uniqueUsers);
-            numCommBags{i,k}=tempnumbags;
-        end
-    end
+    load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numComms',num2str(i),'.mat'],'numComms');
+    numCommBags(i,1:lC(i))=numComms(1:lC(i));
     strCommBags(i,1:lC(i))=strComms(1:lC(i));
 end
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numCommBags.mat'],'numCommBags');
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strCommBags.mat'],'strCommBags');
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commLengths.mat'],'lC');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numCommBags.mat'],'numCommBags');
-% load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commLengths.mat'],'lC');
 %find similar communities in previous snapshots
 clear CommDir numComms i place commSizes
-maxLike=cell((lDir),max(lC));
+if parall==1
+    if ~matlabpool('size')
+        matlabpool open
+    end
+end
+tic
+maxCommSimPercentage=zeros((lDir),max(lC));
 for i=2:lDir
+    tempmaxLike=cell(1,lC(i));
     for j=1:lC(i)
         bag1=numCommBags{i,j};
         tempcommSize=numel(bag1);
@@ -80,18 +63,32 @@ for i=2:lDir
         else
             thres=.41;
         end
-        mytemp=zeros(i-1,lC(i-1));
+        mytemp=zeros(i-1,maxlC);
         for ltmemp=1:3
             l=i-ltmemp;
             if l>0
                 templC=lC(l);
                 if parall==1
                     parfor k=1:templC
-                        mytemp(l,k)=(sum(ismember(bag1,numCommBags{l,k})))/numel(union(bag1,numCommBags{l,k}));
+                        tmp=numel(numCommBags{l,k});
+                        if  (tmp/tempcommSize)>thres && tempcommSize>tmp
+                            mytemp(l,k)=sum(ismembc(numCommBags{l,k},bag1))/numel(unique([bag1;numCommBags{l,k}]));
+                        elseif (tempcommSize/tmp)>thres && tempcommSize<tmp
+                            mytemp(l,k)=sum(ismembc(bag1,numCommBags{l,k}))/numel(unique([bag1;numCommBags{l,k}]));
+                        else
+                            continue
+                        end
                     end
                 else
                     for k=1:templC
-                        mytemp(l,k)=(sum(ismember(bag1,numCommBags{l,k})))/numel(union(bag1,numCommBags{l,k}));
+                        tmp=numel(numCommBags{l,k});
+                        if  (tmp/tempcommSize)>thres && tempcommSize>tmp
+                            mytemp(l,k)=sum(ismembc(numCommBags{l,k},bag1))/numel(unique([bag1;numCommBags{l,k}]));
+                        elseif (tempcommSize/tmp)>thres && tempcommSize<tmp
+                            mytemp(l,k)=sum(ismembc(bag1,numCommBags{l,k}))/numel(unique([bag1;numCommBags{l,k}]));
+                        else
+                            continue
+                        end
                     end
                 end
                 %%if a similar community is detected in previous timeslots, the search continues to the next community
@@ -100,22 +97,22 @@ for i=2:lDir
                 end
             end
         end
-        maxLike{i,j}=sparse(mytemp);
-        clear mytemp
+        if max(max(mytemp))>0
+            tempmaxLike{j}=sparse(mytemp);
+        end
     end
+    %find maximum similarity between communities to speed up the process
+    parfor k=1:lC(i)
+        if ~isempty(tempmaxLike{k});
+            maxCommSimPercentage(i,k)=full(max(max(tempmaxLike{k})));
+        end
+    end
+    save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\tempmaxLike_',num2str(i),'.mat'],'tempmaxLike');
+    clear tempmaxLike
+    toc
 end
-save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numMaxLike_back_jacc.mat'],'maxLike');
-%find maximum similarity between communities to speed up the process
+% save maximum similarity between communities
+save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numMaxCommSimPercentage_jacc.mat'],'maxCommSimPercentage');
 if matlabpool('size')
     matlabpool close
 end
-maxCommSimPercentage=zeros((lDir),max(lC));
-for i=1:(lDir)
-    for j=1:max(lC)
-        if ~isempty((maxLike{i,j}));
-            maxCommSimPercentage(i,j)=full(max(max(maxLike{i,j})));
-        end
-    end
-end
-save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numMaxCommSimPercentage_jacc.mat'],'maxCommSimPercentage');
-

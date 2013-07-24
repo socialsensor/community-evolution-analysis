@@ -17,20 +17,17 @@
 
 function step3_comm_detect_louvain(folder_name,recursive,timeSeg,parall) %%Comment this line if you need the script
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%stand alone script %%comment the following 7 lines if you need the fn
+%stand alone script %%comment the following 4 lines if you need the fn
 % recursive=0;
-% folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
-% timeSegCopy={600 1800 3600 21600 43200 86400}; %Snapshot every so many secs
-% choice = menu('Please select sampling rate...',timeSegCopy);
-% timeSeg=timeSegCopy{choice};
-% myOptions={'Yes' 'No'};
-% parall = menu('Parallel processing toolbox available?',myOptions);
+% folder_name=uigetdir; %%select the directory of interest
+% timeSeg=43200; %%{600 1800 3600 21600 43200 86400}; %Change the value of timeSeg in respect to the desired time sampling interval (seconds)
+% parall = 1; %% should be set to 1 if the parallel computing toolbox is available and to 0 if it's not.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 mkdir(folder_name,['\data\mats\timeSeg_',num2str(timeSeg)]);
 CommDir=dir([folder_name,'\data\mats\adjMats\timeSeg_',num2str(timeSeg),'\adjMat*.mat']);
 lDir=length(CommDir);
 mymodularity=zeros(1,lDir);
-commSizes=cell(lDir,1);
+commSizes=zeros(lDir,1);
 cellAdjMat=cell(lDir,1);
 %load all the adjMats into a cell array
 for k=1:lDir
@@ -44,13 +41,15 @@ if parall==1
         matlabpool open
     end
     parfor k2=1:lDir
-        [comm_struct,~] = comm_detect_louvain(cellAdjMat{k2},recursive,0,0,0);
+        tempAdjMat=cellAdjMat{k2};
+        [comm_struct,~] = comm_detect_louvain(tempAdjMat,recursive,0,0,0);
         mymodularity(k2)=comm_struct.MOD;
         commStructure{k2}=comm_struct;
     end
 else
     for k2=1:lDir
-        [comm_struct,~] = comm_detect_louvain(cellAdjMat{k2},recursive,0,0,0);
+        tempAdjMat=cellAdjMat{k2};
+        [comm_struct,~] = comm_detect_louvain(tempAdjMat,recursive,0,0,0);
         mymodularity(k2)=comm_struct.MOD;
         commStructure{k2}=comm_struct;
     end
@@ -62,16 +61,20 @@ end
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\commStructure.mat'],'commStructure');
 for k=1:lDir
     comm_struct=commStructure{k};
-    commSizes(k,1:length(comm_struct.SIZE{1}))=num2cell(comm_struct.SIZE{1});
+    commSizes(k,1:length(comm_struct.SIZE{1}))=comm_struct.SIZE{1};
     strComms=cell(1,max(comm_struct.COM{1}));
+    numComms=cell(1,max(comm_struct.COM{1}));
     tempUsersCommNums=comm_struct.COM{1};
     load([folder_name,'\data\mats\adjMats\timeSeg_',num2str(timeSeg),'\tempUsers_',num2str(k),'.mat']);
-    for i=1:length(comm_struct.COM{1})
-        numUsers=find(comm_struct.COM{1}==comm_struct.COM{1}(i));
-        strComms{comm_struct.COM{1}(i)}=tempUsers(numUsers);
+    for i=1:max(comm_struct.COM{1})
+        numUsers=find(comm_struct.COM{1}==i);
+        strComms{i}=tempUsers(numUsers,1);
+        numComms{i}=sort(cell2mat(tempUsers(numUsers,2)));
     end
     %save cell array of communities with real names
     save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strComms',num2str(k),'.mat'],'strComms');
+	%save cell array of communities with their uniqueUsers' indices
+    save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\numComms',num2str(k),'.mat'],'numComms');
     %save corresponding community number to each user
     save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\tempUsersCommNums',num2str(k),'.mat'],'tempUsersCommNums');
 end

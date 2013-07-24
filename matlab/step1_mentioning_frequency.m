@@ -3,81 +3,45 @@
 % Intellectual Property of ITI (CERTH)%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This .m file extracts the user activity in respect to twitter mentions. %
+% The preprocessed data file is acquired from the python scipt            %
+% "json_parser_singlefile.py" if json files are available or from the     %
+% "authorMentionTimeParser" if txt files are available.                   %
 % It can either work as a standalone script or as a function for the main %
-% m-file.                                                                 %
-% The parall variable should be set to 1 if the parallel computing toolbox%
-% is available and to 0 if it's not.									  %
-% Please comment the function line below accordingly                      %
+% m-file. Please comment the function line below accordingly.             %
 % The data to be analysed is in the ../data folder                        %
-% If there are more than one txt files in the ../data folder containing   %
-% the data please number them incrementally starting with 1 (norton       %
-% commander is a good tool)      										  %
 % The user is prompted to select the time sampling interval that seems    %
 % more appropriate for the specific dataset.                              %
 % A time sampling interval of 43200secs was selected for the PCI13 dataset%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function timeSeg=step1_mentioning_frequency(folder_name,show_plots,parall) %%Comment this line if you need the script
+function timeSeg=step1_mentioning_frequency(folder_name,show_plots,pci13,mymatlab) %%Comment this line if you need the script
 %%%%%%%%%%%%%%
-myOptions={'Yes' 'No'};
-%%% standalone script %%comment the following two lines if you need the fn
-%older_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
-%parall = menu('Parallel processing toolbox available?',myOptions);
-%show_plots = menu('Would you like to see the activity plots?',myOptions);
+%%% standalone script %%comment the following 4 lines if you need the fn
+% folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
+% show_plots = 1; %% should be set to 1 if the plots are to be shown and to 0 if not.
+% pci13= 1; %% should be set to 1 if the pci13 dataset is used and to 0 if not.
+% mymatlab= 1; %% should be set to 1 if matlab is being used. For octave change it to any other number.
 %%%%%%%%%%%%%%
-pci13= menu('Are you running the PCI13 dataset?',myOptions);
 mkdir([folder_name,'\data\mats']);mkdir([folder_name,'\data\txts']);
-dbstop if error
-lenDir=length(dir([folder_name,'\data\*.txt'])); %number of txt files in the folder
-if lenDir>1 %if the data is contained in multiple files
-    templA=1;
-    for txtfile=1:lenDir
-        fid = fopen([folder_name,'\data\',num2str(txtfile),'.txt']);
-        C = textscan(fid,'%*s %*s %q %*[^\n]', 'CollectOutput');
-        fclose(fid);
-        lngth=length(C{1})+templA-1;
-        time(templA:lngth,1)=C{1};
-        templA=length(time)+1;
-    end
-else
-    fid = fopen([folder_name,'\data\1.txt']); %if the data is contained in a single file
-    C = textscan(fid,'%*s %*s %q %*[^\n]', 'CollectOutput');
-    fclose(fid);
-    time=C{1};
-end
+fid = fopen([folder_name,'\data\1.txt']);
+C = textscan(fid,'%*s %*s %d %*[^\n]', 'CollectOutput');
+fclose(fid);
+time=(C{1});
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%extract time vectors from the time stamps
+%time difference from one mention to the next
+time2=cat(1,time(1),time);time2=time2(1:end-1);
+timeDif=single(time-time2);
 lT=length(time);
-datetime=cell(lT,1);
-if parall==1
-    if ~matlabpool('size')
-        matlabpool open
-    end
-    parfor xa=1:lT
-        datetime{xa}=datevec(time{xa},'ddd mmm dd HH:MM:SS yyyy');
-    end
-else
-    datetime=(cellfun(@(x)datevec(x, 'ddd mmm dd HH:MM:SS yyyy'), time,'uni',false));
-end
-if matlabpool('size')
-    matlabpool close
-end
-clear time
+clear time time2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-timeDif=single(zeros(lT,1)); timeini=datetime{1,:};
-timeSegCopy=[600 1800 3600 21600 43200 86400];
+timeSegCopy=[600 1800 3600 21600 43200 86400]; %For other datasets, other timesamples might be needed. Adopt appropriately.
 for timeSeg=[600 1800 3600 21600 43200 86400] %Please provide sampling time intervals in seconds
     curTime=0;
     bin=1;
     freqStat=0;freqStatIni=0;freqStatMoved=0;
     mentionLimit=0;
     for i=1:lT  %create a list of mentions in separate cells and time differences
-        if not(timeSeg-timeSegCopy(1))
-            %time difference from one mention to the next (it only runs once)
-            timeDif(i)=etime(datetime{i,:},timeini);
-        end
         curTime=curTime+timeDif(i);
-        timeini=datetime{i,:};
         if curTime<=timeSeg
             freqStat(bin)=freqStat(bin)+1;
         else
@@ -108,11 +72,12 @@ for timeSeg=[600 1800 3600 21600 43200 86400] %Please provide sampling time inte
     end
     if exist('POI')
         save([folder_name,'\data\mats\POI_',num2str(timeSeg),'.mat'],'POI');
+    else
+        POI(counter)=k;
+        save([folder_name,'\data\mats\POI_',num2str(timeSeg),'.mat'],'POI');
     end
     clear POI
 end
-saveTimeDif = ([folder_name,'\data\mats\TimeDif.mat']);
-save(saveTimeDif, 'timeDif');%save the time difference from one mention to the next
 %%Plot the activity graphs (these following parameters and text are specific to the PCI13 paper dataset)
 if show_plots==1
     mentionsPer={'10min intervals' '30min intervals' '1hour intervals' '6hour intervals' '12hour intervals' '1day intervals'};
@@ -136,7 +101,8 @@ if show_plots==1
             dates{k,1}=[num2str(k-86),'/05'];
         end
     end
-    figure;
+    h=figure;bin=1;
+    mkdir([folder_name,'\data\figures']);
     for i=1:length(timeSeg)
         load([folder_name,'\data\mats\MentionFreqPer_',num2str(timeSeg(i)),'_secs.mat']);
         load([folder_name,'\data\mats\POI_',num2str(timeSeg(i)),'.mat'],'POI');
@@ -144,7 +110,7 @@ if show_plots==1
         if i>3
             j=i-3;
             if i==4
-                figure;
+                h=figure;
             end
         end
         hold on
@@ -154,17 +120,30 @@ if show_plots==1
             hold
             subplot(3,1,j), plot(POI,freqStat(POI),'ro'), xlim([0 maxDateinSecs/timeSeg(i)]);
             hold off
+            if i==3 || i==6
+                saveas(h, [folder_name,'\data\figures\',num2str(bin),'.fig'],'fig');
+                saveas(h, [folder_name,'\data\figures\',num2str(bin),'.jpg'],'jpg');
+                bin=bin+1;
+            end
         else
             subplot(3,1,j), plot(freqStat), xlabel('Date'), ylabel(['User Activity (#tweets/',num2str(timeSeg(i)/3600),')']);
             hold
             subplot(3,1,j), plot(POI,freqStat(POI),'ro');
             hold off
+            if i==3 || i==6
+                saveas(h, [folder_name,'\data\figures\',num2str(bin),'.fig'],'fig');
+                saveas(h, [folder_name,'\data\figures\',num2str(bin),'.jpg'],'jpg');
+                bin=bin+1;
+            end
         end
     end
 end
-timeSeg={600 1800 3600 21600 43200 86400}; %Snapshot every timeSeg secs
-choice = menu('Please select sampling rate...',timeSeg);
-timeSeg=timeSeg{choice};
+if mymatlab==1
+    timeSeg={600 1800 3600 21600 43200 86400}; %Snapshot every timeSeg secs (For other datasets, other timesamples might be needed. Adopt appropriately.)
+    choice = menu('Please select sampling rate...',timeSeg);
+    timeSeg=timeSeg{choice};
+end
+clear choice
 
 
 
