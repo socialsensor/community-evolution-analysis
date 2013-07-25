@@ -13,7 +13,7 @@
 # Copyright:     (c) ITI (CERTH) 2013
 # Licence:       <apache licence 2.0>
 #-------------------------------------------------------------------------------
-import glob
+import os,glob
 import wx
 import dateutil.parser
 import time
@@ -31,8 +31,14 @@ dialog = wx.DirDialog(None, "Please select your target folder:",defaultPath=targ
 if dialog.ShowModal() == wx.ID_OK:
     target_path= dialog.GetPath()
 dialog.Destroy()
+if dataset_path==target_path and not os.path.exists(target_path+"/new"):
+    os.makedirs(target_path+"/new")
+    my_txt=open(target_path+"/new/authors_mentions_time.txt","w")
+elif dataset_path==target_path and os.path.exists(target_path+"/new"):
+    my_txt=open(target_path+"/new/authors_mentions_time.txt","w")
+else:
+    my_txt=open(target_path+"/authors_mentions_time.txt","w")
 #Parsing commences
-my_txt=open(target_path+"/authors_mentions_time.txt","w")
 for filename in glob.glob(dataset_path+"/*.txt"):
     print(filename)
     with open(filename,'r') as f:

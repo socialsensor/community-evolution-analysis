@@ -13,15 +13,17 @@
 # Copyright:     (c) ITI (CERTH) 2013
 # Licence:       <apache licence 2.0>
 #-------------------------------------------------------------------------------
-import glob
+import os,glob
 import dateutil.parser
 import time
 
 # User sets json dataset and target folder
 dataset_path = "E:/konkonst/retriever/crawler_temp"
 
+if not os.path.exists(dataset_path+"/new"):
+    os.makedirs(dataset_path+"/new")
 #Parsing commences
-my_txt=open(dataset_path+"/authors_mentions_time.txt","w")
+my_txt=open(dataset_path+"/new/authors_mentions_time.txt","w")
 for filename in glob.glob(dataset_path+"/*.txt"):
     print(filename)
     with open(filename,'r') as f:
