@@ -3,8 +3,8 @@
 % Intellectual Property of ITI (CERTH)%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This .m file extracts the community adjacency matrix in between         %
-% timeslots. (In this case, the communities are treated as users.)                 %
-% The commAdjMats are written in mat format but also as csvs for gephi    %
+% timeslots. (In this case, the communities are treated as users.)        %
+% The commAdjMats are written in mat format but also as csvs for gephi.   %
 % It can either work as a standalone script or as a function for the main %
 % m-file                                                                  %
 % Please comment the function lines below accordingly                     %

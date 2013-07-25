@@ -10,4 +10,100 @@ We make available a Twitter interaction network collector and a set of Matlab sc
 
 [1] K. Konstandinidis, S. Papadopoulos, Y. Kompatsiaris. "Community Structure, Interaction and Evolution Analysis of Online Social Networks around Real-World Social Phenomena". In Proceedings of PCI 2013, Thessaloniki, Greece (to be presented in September).  
 [2] V. Blondel, J.-L. Guillaume, R. Lambiotte, E. Lefebvre. "Fast unfolding of communities in large networks". In Journal of Statistical Mechanics: Theory and Experiment (10), P10008, 2008  
-[3] S. Brin and L. Page. "The anatomy of a large-scale hypertextual web search engine". Comput. Netw. ISDN Syst., 30(1-7):107{117, Apr. 1998.
+[3] S. Brin and L. Page. "The anatomy of a large-scale hypertextual web search engine". Comput. Netw. ISDN Syst., 30(1-7):107{117}, Apr. 1998.
+
+##Distribution Information##
+This distribution contains the following:  
+* a readme.txt file with instructions on how to use the different parts of the framework;
+* a data collector (in the /crawler folder) that makes use of the Twitter Streaming API to collect mention networks between Twitter users;
+* a set of Python scripts (in the /python folder) that are used to parse the json files retrieved by the data collector in a "Matlab friendly" form.
+* a set of Matlab scripts (in the /matlab folder) that are used to conduct community evolution analysis.
+
+
+##Data##
+In the case where the user has data from a different source other than the provided crawler, in order for the python files to work, the data should either be in a json twitter-like form  (the \"entities\", \"user\" and \"created\_at\" keys and paths should be identical with twitter's) or in a txt file of the form:
+
+    user1 \TAB user2,user3... \TAB "created_at_timestamp" \TAB text \newline  
+
+##Crawler##
+Before using the crawler, the user should go on http://dev.twitter.com, set up an account and create a new application. S/he should then acquire the _Consumer key_, the _Consumer secret_, _Access token_ and the _Access token secret_ which should be manually inserted into the _../crawler/crawl.xml_ file.  
+The crawling is done though a _jar_ file in the crawler folder using the following command in the command prompt:
+
+    java -jar retriever.jar --mentionet testnet.txt --keywords keywords.txt
+
+In order to retrieve the full json of the tweet type:  
+
+    java -jar retriever.jar --mentionet testnet.txt --keywords keywords.txt -file rawmetadata.json 
+
+The crawler returns _testnet.txt.#_ and _rawmetadata.json.#_ files which should be processed by the corresponding python script in order to be able to perform the analysis using the matlab files.
+The python resulting txt file should be added to the _../data/_ folder.  
+
+##json Parsing (Python)##
+The python code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with the jsons extracted from the crawler and 4 files to be used with jsons from any other Twitter API dependant source.  
+More specifically, they are used to create txt files which contain the mentions entries between twitter users as well as the time at which these mentions were made and the context in which they were included.  
+
+The json_mention_multifile* files provide as many txt files as there are json files. 
+They contain all the information required from the tweet in a readable form:
+
+    user1 \TAB user2,user3... \TAB "created_at_timestamp" \TAB text \newline
+
+The json_mention_matlab_singleFile* files provide a single file which contains only the data
+required to perform the community analysis efficiently. They contain information in a "Matlab friendly" form:
+
+    user1 \TAB user2 \TAB unix_timestamp \TAB \newline
+    user1 \TAB user3 \TAB unix_timestamp \TAB \newline
+
+This folder contains 12 files:
+* <code>json\_mention\_multifile\_crawler.py & json\_mention\_matlab\_singleFile_crawler.py</code>  
+    These .py files are used to parse rawmetadata.json.# files straight from the crawler. (The files should be moved to a new folder before parsing commenses)
+* <code>json_mention\_multifile\_noDialog_crawler.py & json\_mention\_matlab\_singleFile_noDialog_crawler.py</code>  
+    These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
+* <code>json\_mention\_multifile\_parser.py & json\_mention\_matlab\_singleFile_parser.py</code>  
+    These files are used when the user has *.json files from another source.
+* <code>json\_mention\_multifile\_noDialog\_parser.py & json\_mention\_matlab\_singleFile\_noDialog_parser.py</code>  
+    These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
+* <code>txt\_mention\_matlab\_singleFile\_crawler.py & txt\_mention\_matlab\_singleFile\_noDialog\_crawler.py</code>  
+    These .py files are used to parse testnet.txt.# files straight from the crawler. (The files should be moved to a new folder before parsing commenses)
+* <code>txt\_mention\_matlab\_singleFile\_parser.py & txt\_mention\_matlab\_singleFile\_noDialog\_parser.py</code>  
+    These files are used when the user has *.txt files from another source.  
+
+The resulting authors\_mentions\_time.txt file should be added to the _../data/_ folder. 
+    
+##Evolution analysis (Matlab)##
+Any new data to be analysed should be placed in the _../data/_ folder  
+The matlab code consists of 13 files which can either work as standalone scripts, or as functions of the _main.m_ script. 
+The only thing that needs changing is a comment of the function line in each of the m-files (instructions are included in the m-files).  
+These 13 files are:  
+* <code>step1\_mentioning\_frequency.m</code>  
+    This .m file extracts the user activity in respect to twitter mentions  
+* <code>step2\_dyn_adj\_mat_wr.m</code>  
+    This .m file extracts the dynamic adjacency matrices for each respective timeslot and save it into a mat format for use with the rest of the code but also in a csv gephi-ready format.  
+* <code>step3\_comm\_detect_louvain.m</code>  
+    This .m file detects the communities in each adjacency matrix as well as the sizes of the communities and the modularity for each timeslot using Louvain mentod (V. D. Blondel, J.-L. Guillaume, R. Lambiotte, and E. Lefebvre. Fast unfolding of communities in large networks. Journal of Statistical Mechanics: Theory and Experiment, 2008(10):P10008 (12pp), 2008.).  
+* <code>step4\_comm\_evol_detect.m</code>  
+    This .m file detects the evolution of the communities between timeslots.  
+* <code>step5_commRoutes.m</code>  
+    This .m file detects the routes created by the evolution of the communities between timeslots.  
+* <code>step6\_usrCentrality.m</code>  
+    This .m file extracts the user centrality of all adjacency matrices in between timeslots using the pagerank algorithm.  
+* <code>step7\_comm\_dyn\_adj\_mat\_wr.m</code>  
+    This .m file extracts the community adjacency matrix in between timeslots (in this case, the communities are treated as users). The commAdjMats are written in mat format but also as csvs for gephi.
+* <code>step8\_commCentralityExtraction.m
+	This .m file extracts the centrality of the community adjacency matrices using the PageRank algorithm.
+* <code>step9\_commRank\_commCentr.m</code> 
+	This .m file provides an analysis of the communities in respect to their evolution in terms of community centrality. 
+* <code>step9\_commRank\_stability.m</code> 
+	This .m file provides an analysis of the communities in respect to their evolution in terms of stability.
+* <code>step9\_commRank\_persist.m</code> 
+This .m file provides an analysis of the communities in respect to their evolution in terms of persistence.
+* <code>step9\_commRank\_synergy.m</code> 
+	This .m file provides an analysis of the communities in respect to their evolution in terms of persistence, stability and community centrality. A heatmap presenting the evolution and size of all evolving communities is produced giving an idea of the bigger picture.
+* <code>step9\_commRank\_comparison.m</code> 
+	This .m file provides a comparison of the communities perceived as most significant by 3 different community evolution factors: stability, persistance and community centrality. The synergy of the 3 is also available for comparison.
+
+There are also 4 assistive functions which are used to extract the position of each user in the adjacency matrix (_pos\_aloc\_of\_usrs.m_), to create the adjacency matrix (_adj\_mat\_creator.m_), to perform the community detection (_comm\_detect\_louvain.m_) and to extract the centrality of each user using the pagerank algorithm (_mypagerank.m_).
+
+##Results##
+The final outcome is a cell array in ../data/mats/signifComms.mat containing the most significant dynamic communities, their users and the centrality of the users.
+_.../data/mats/commEvol.mat_ and _.../data/mats/commEvolSize.mat_ are also useful as they present the evolution of the communities and the community sizes respectfully.
+A heatmap presenting the evolution and size of all evolving communities is also produced giving the user an idea of the bigger picture (../data/figures/).

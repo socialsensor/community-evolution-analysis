@@ -4,8 +4,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This .m file provides an analysis of the communities in respect to their%
 % evolution in terms of community centrality.                             %
-% A heatmap presenting the evolution and size of all evolving communities %
-% is produced giving an idea of the bigger picture.                       %
 % It can either work as a standalone script or as a function for the main %
 % m-file.                                                                 %
 % Please comment the function lines below accordingly.                    %
