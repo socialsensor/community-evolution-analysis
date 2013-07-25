@@ -1,21 +1,19 @@
-# -*- coding: cp1253 -*-
 #-------------------------------------------------------------------------------
-# Name:        authorMentionTimeParser
-# Purpose:     parsing data from a txt file having a form of:
-#              author1 mentioned1,mentioned2,... timestamp text \n
-#              to a form:
-#              author1 mentioned1 timestamp\n
-#              author1 mentioned2 timestamp\n
-#              thus creating a single file without the text content in order to render
-#              the matlab functions more efficient.
-# Author:      konkonst
+# Purpose:       parsing data from a txt file having a form of:
+#                author1 mentioned1,mentioned2,... timestamp text \n
+#                to a form:
+#                author1 mentioned1 timestamp\n
+#                author1 mentioned2 timestamp\n
+#                thus creating a single file without the text content in order to render
+#                the matlab functions more efficient.
+# Required libs: wxPython GUI toolkit, python-dateutil
+# Author:        konkonst
 #
-# Created:     31/05/2013
-# Copyright:   (c) ITI (CERTH) 2013
-# Licence:     <apache licence 2.0>
+# Created:       31/05/2013
+# Copyright:     (c) ITI (CERTH) 2013
+# Licence:       <apache licence 2.0>
 #-------------------------------------------------------------------------------
-
-import oglob
+import os,glob
 import wx
 import dateutil.parser
 import time
@@ -33,8 +31,14 @@ dialog = wx.DirDialog(None, "Please select your target folder:",defaultPath=targ
 if dialog.ShowModal() == wx.ID_OK:
     target_path= dialog.GetPath()
 dialog.Destroy()
+if dataset_path==target_path and not os.path.exists(target_path+"/new"):
+    os.makedirs(target_path+"/new")
+    my_txt=open(target_path+"/new/authors_mentions_time.txt","w")
+elif dataset_path==target_path and os.path.exists(target_path+"/new"):
+    my_txt=open(target_path+"/new/authors_mentions_time.txt","w")
+else:
+    my_txt=open(target_path+"/authors_mentions_time.txt","w")
 #Parsing commences
-my_txt=open(target_path+"/authors_mentions_time.txt","w")
 for filename in glob.glob(dataset_path+"/*.txt"):
     print(filename)
     with open(filename,'r') as f:
