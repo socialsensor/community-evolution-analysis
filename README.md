@@ -5,7 +5,7 @@ community-evolution-analysis
 We make available a Twitter interaction network collector and a set of Matlab scripts that enable the analysis of social interaction networks with the goal of uncovering evolving communities. More specifically, the interaction network collector forms a network between Twitter users based on the mentions in the set of monitored tweets (using the Streaming API). The network of interactions is adaptively partitioned into snapshot graphs based on the frequency of interactions. Then, each graph snapshot is partitioned into communities using the Louvain method [2]. Dynamic communities are extracted by matching the communities of the current graph snapshot to communities of previous snapshot. Finally, these dynamic communities are ranked and presented to the user in accordance to three factors; stability, peristence and community centrality. The user can browse through these communities in which the users are also ranked in accordance to their own specific snapshot centrality. The PageRank algorithm [3] is used to measure the feature of centrality.
 
 * The master branch of this repository contains ongoing matlab and python files which form the current stable version of the framework. 
-* The _"PCI13"_ branch contains all the code and data needed to replicate the experiments performed in [1].
+* The _"pci13"_ branch contains all the code and data needed to replicate the experiments performed in [1].
 * The _"dev"_ branch contains more advanced but unstable versions of the framework.
 
 [1] K. Konstandinidis, S. Papadopoulos, Y. Kompatsiaris. "Community Structure, Interaction and Evolution Analysis of Online Social Networks around Real-World Social Phenomena". In Proceedings of PCI 2013, Thessaloniki, Greece (to be presented in September).  
@@ -21,7 +21,7 @@ This distribution contains the following:
 
 
 ##Data##
-In the case where the user has data from a different source other than the provided crawler, in order for the python files to work, the data should either be in a json twitter-like form  (the \"entities\", \"user\" and \"created\_at\" keys and paths should be identical with twitter's) or in a txt file of the form:
+In the case where the user has data from a different source other than the provided crawler, in order for the python files to work, the data should either be in a json twitter-like form  (the "entities", "user" and "created\_at" keys and paths should be identical with twitter's) or in a txt file of the form:
 
     user1 \TAB user2,user3... \TAB "created_at_timestamp" \TAB text \newline  
 
