@@ -85,11 +85,12 @@ end
 %As well as returning the most significant Comms in the workspace, we also save them in the ../mats/timeSeg_yourchoice/ folder. 
 save([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\signifComms.mat'],'signifComms')
 %The last part produces a heatmap presenting the evolution and size of all evolving communities.
-figure
+h=figure;
 image(commEvolSize'),xlabel('Time Step'), ylabel('Evolving Community #');
 colormap gray(10);
 cmap = colormap;
 cmap = flipud(cmap);
 colormap(cmap);
+saveas(h, [folder_name,'\data\figures\evolutionHeatMap.fig'],'fig');
 
 

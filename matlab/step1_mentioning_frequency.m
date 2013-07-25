@@ -17,11 +17,10 @@ function timeSeg=step1_mentioning_frequency(folder_name,show_plots) %%Comment th
 %%%stand alone script %%comment the following 4 lines if you need the fn
 %folder_name=uigetdir; %%Or this line if you need the function %%select the directory of interest
 %show_plots = 1; %% should be set to 1 if the plots are to be shown and to 0 if not.
-%parall = 1; %% should be set to 1 if the parallel computing toolbox is available and to 0 if it's not.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 mkdir([folder_name,'\data\mats']);mkdir([folder_name,'\data\txts']);
-fid = fopen([folder_name,'\data\txts\authors_mentions_time.txt']); 
+fid = fopen([folder_name,'\data\authors_mentions_time.txt']); 
 C = textscan(fid,'%*s %*s %d %*[^\n]', 'CollectOutput');
 fclose(fid);
 time=C{1};
@@ -76,25 +75,10 @@ end
 %%Plot the activity graphs (these following parameters and text are specific to the PCI13 paper txtsset)
 mkdir([folder_name,'\data\figures']);
 if show_plots==1
-    mentionsPer={'10min intervals' '30min intervals' '1hour intervals' '6hour intervals' '12hour intervals' '1day intervals'};
+    mentionsPer={'10min intervals' '15min intervals' '20min intervals' '30min intervals' '45min intervals' '60min intervals'};
     realDays=length(freqStat);
     maxDateinSecs=max(cell2mat(timeSegCopy))*realDays;
-    %     %The following dates only apply to the PCI13 txtsset. Comment for
-    %     %different txtssets.
-    %     dates=cell(realDays,1);
-    %     for k=1:4:25
-    %         dates{k,1}=[num2str(k+3),'/02'];
-    %     end
-    %     for k=29:4:56
-    %         dates{k,1}=[num2str(k-25),'/03'];
-    %     end
-    %     for k=57:4:86
-    %         dates{k,1}=[num2str(k-56),'/04'];
-    %     end
-    %     for k=87:4:93
-    %         dates{k,1}=[num2str(k-86),'/05'];
-    %     end
-    figure;
+    h=figure;
     bin=1;
     for i=1:length(timeSegCopy)
         load([folder_name,'\data\mats\MentionFreqPer_',num2str(timeSegCopy{i}),'_secs.mat']);
@@ -120,8 +104,8 @@ if show_plots==1
     end
 end
 %Selection of Snapshot every timeSegCopy secs
-% choice = menu('Please select sampling rate...',timeSegCopy);
-% timeSeg=timeSegCopy{choice};
+choice = menu('Please select sampling rate...',timeSegCopy);
+timeSeg=timeSegCopy{choice};
 
 
 

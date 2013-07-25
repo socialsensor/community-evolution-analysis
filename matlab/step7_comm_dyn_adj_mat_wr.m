@@ -24,7 +24,7 @@ for k=1:lDir
     load([folder_name,'\data\mats\adjMats\timeSeg_',num2str(timeSeg),'\adjMat_',num2str(k),'.mat']);
     load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strComms',num2str(k),'.mat'],'strComms');
     load([folder_name,'\data\mats\adjMats\timeSeg_',num2str(timeSeg),'\tempUsers_',num2str(k),'.mat']);
-    load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\tempUsersCommNums_',num2str(k),'.mat'],'tempUsersCommNums');
+    load([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\tempUsersCommNums',num2str(k),'.mat'],'tempUsersCommNums');
     %%%%%%%%%%%%%%%%%%%
     lStrComm=length(find(cellfun(@numel,strComms)>2));%find all the communities which consist of 3 members or more 
     lTempUsrs=length(tempUsers);

@@ -20,7 +20,7 @@ function step2_dyn_adj_mat_wr(folder_name,timeSeg) %%Comment this line if you ne
 
 mkdir(folder_name,['\data\txts\adjMats\timeSeg_',num2str(timeSeg)]);
 mkdir(folder_name,['\data\mats\adjMats\timeSeg_',num2str(timeSeg)]);
-fid = fopen([folder_name,'\data\txts\authors_mentions_time.txt']);
+fid = fopen([folder_name,'\data\authors_mentions_time.txt']);
 C = textscan(fid,'%s %s %*[^\n]', 'CollectOutput');%extract mentioners and mentioned users
 fclose(fid);
 authors=C{1}; mentions=C{2};%complete authors & mentions
