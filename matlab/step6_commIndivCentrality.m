@@ -38,7 +38,7 @@ for i=1:lDir
             matlabpool open
         end
         parfor k=1:length(strComms)
-            [~,tempNumUsrs]=ismember(strComms{k},tempUsers);
+            [~,tempNumUsrs]=ismember(strComms{k},tempUsers(:,1));
             commUsrCentr{i,k}=tempAdjMatCentr(tempNumUsrs);
         end
     else

@@ -52,17 +52,21 @@ required to perform the community analysis efficiently. They contain information
     user1 \TAB user2 \TAB unix_timestamp \TAB \newline
     user1 \TAB user3 \TAB unix_timestamp \TAB \newline
 
-This folder contains 8 files:
+This folder contains 12 files:
 
 * <code>json\_mention\_multifile\_crawler.py & json\_mention\_matlab\_singleFile_crawler.py</code>  
-    These .py files is used to parse rawmetadata.json.# files straight from the crawler. (The files should be moved to a new folder before parsing commenses)
+    These .py files are used to parse rawmetadata.json.# files straight from the crawler. (The files should be moved to a new folder before parsing commenses)
 * <code>json_mention\_multifile\_noDialog_crawler.py & json\_mention\_matlab\_singleFile_noDialog_crawler.py</code>  
     These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
 * <code>json\_mention\_multifile\_parser.py & json\_mention\_matlab\_singleFile_parser.py</code>  
     These files are used when the user has *.json files from another source.
 * <code>json\_mention\_multifile\_noDialog\_parser.py & json\_mention\_matlab\_singleFile\_noDialog_parser.py</code>  
     These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
-	
+* <code>txt\_mention\_matlab\_singleFile\_crawler.py & txt\_mention\_matlab\_singleFile\_noDialog\_crawler.py</code>  
+    These .py files are used to parse testnet.txt.# files stright from the crawler. (The files should be moved to a new folder before parsing commenses)
+* <code>txt\_mention\_matlab\_singleFile\_parser.py & txt\_mention\_matlab\_singleFile\_noDialog\_parser.py</code>  
+    These files are used when the user has *.txt files from another source.  
+    
 ##Evolution analysis (Matlab)##
 Any new data to be analysed should be placed in the _../data/_ folder replacing the _1.txt_ file.  
 The matlab code consists of 7 files which can either work as standalone scripts, or as functions of the _main.m_ script.  

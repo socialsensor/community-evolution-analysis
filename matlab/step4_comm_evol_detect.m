@@ -11,9 +11,9 @@
 function step4_comm_evol_detect(folder_name,timeSeg,parall) %%Comment this line if you need the script
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %stand alone script %%comment the following 3 lines if you need the fn
-%folder_name=uigetdir; %%select the directory of interest
-%timeSeg=43200; %%{600 1800 3600 21600 43200 86400}; %Change the value of timeSeg in respect to the desired time sampling interval (seconds)
-%parall = 1; %% should be set to 1 if the parallel computing toolbox is available and to 0 if it's not.
+% folder_name=uigetdir; %%select the directory of interest
+% timeSeg=43200; %%{600 1800 3600 21600 43200 86400}; %Change the value of timeSeg in respect to the desired time sampling interval (seconds)
+% parall = 1; %% should be set to 1 if the parallel computing toolbox is available and to 0 if it's not.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 CommDir=dir([folder_name,'\data\mats\timeSeg_',num2str(timeSeg),'\strComms*.mat']);
 lDir=length(CommDir);
