@@ -15,26 +15,15 @@
 # Licence:     <apache licence 2.0>
 #-------------------------------------------------------------------------------
 
-import oglob
-import wx
+import glob
 import dateutil.parser
 import time
 
-# User selects dataset folder
-app = wx.PySimpleApp()
-datasetPath = 'E:/konkonst/retriever/crawler_temp/'
-dialog = wx.DirDialog(None, "Please select your dataset folder:",defaultPath=datasetPath)
-if dialog.ShowModal() == wx.ID_OK:
-    dataset_path= dialog.GetPath()
-dialog.Destroy()
-#User selects target folder
-targetPath = 'E:/konkonst/retriever/crawler_temp/'
-dialog = wx.DirDialog(None, "Please select your target folder:",defaultPath=targetPath)
-if dialog.ShowModal() == wx.ID_OK:
-    target_path= dialog.GetPath()
-dialog.Destroy()
+# User sets json dataset and target folder
+dataset_path = "E:/konkonst/retriever/Journalist jsons/all Journalist Jsons/USElection_tags"
+
 #Parsing commences
-my_txt=open(target_path+"/authors_mentions_time.txt","w")
+my_txt=open(dataset_path+"/authors_mentions_time.txt","w")
 for filename in glob.glob(dataset_path+"/*.txt"):
     print(filename)
     with open(filename,'r') as f:
