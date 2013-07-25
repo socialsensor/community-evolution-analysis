@@ -4,7 +4,7 @@
 #                author1 mentioned2,... unixTimestamp\n
 #                creating a single file without the text content to render the
 #                matlab functions more efficient.
-#		 This .py file does not present the user with a folder selection dialog.
+#		         This .py file does not present the user with a folder selection dialog.
 # Required libs: python-dateutil
 # Author:        konkonst
 #
