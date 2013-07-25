@@ -1,6 +1,4 @@
-# -*- coding: cp1253 -*-
 #-------------------------------------------------------------------------------
-# Name:        authorMentionTimeParser
 # Purpose:     parsing data from a txt file having a form of:
 #              author1 mentioned1,mentioned2,... timestamp text \n
 #              to a form:
@@ -14,13 +12,12 @@
 # Copyright:   (c) ITI (CERTH) 2013
 # Licence:     <apache licence 2.0>
 #-------------------------------------------------------------------------------
-
 import glob
 import dateutil.parser
 import time
 
 # User sets json dataset and target folder
-dataset_path = "E:/konkonst/retriever/Journalist jsons/all Journalist Jsons/USElection_tags"
+dataset_path = "E:/konkonst/retriever/crawler_temp"
 
 #Parsing commences
 my_txt=open(dataset_path+"/authors_mentions_time.txt","w")

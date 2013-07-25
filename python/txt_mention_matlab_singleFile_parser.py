@@ -1,6 +1,4 @@
-# -*- coding: cp1253 -*-
 #-------------------------------------------------------------------------------
-# Name:        authorMentionTimeParser
 # Purpose:     parsing data from a txt file having a form of:
 #              author1 mentioned1,mentioned2,... timestamp text \n
 #              to a form:
@@ -14,8 +12,7 @@
 # Copyright:   (c) ITI (CERTH) 2013
 # Licence:     <apache licence 2.0>
 #-------------------------------------------------------------------------------
-
-import oglob
+import glob
 import wx
 import dateutil.parser
 import time
