@@ -20,7 +20,7 @@ import dateutil.parser
 import time
 
 # User sets json dataset and target folder
-dataset_path = "E:/konkonst/retriever/Journalist jsons/all Journalist Jsons/USElection_tags"
+dataset_path = "E:/konkonst/retriever/Journalist jsons/all Journalist Jsons/cycling_Track_ABCD"
 
 ###Parsing commences###
 my_txt=open(dataset_path+"/authors_mentions_time.txt","w")
@@ -36,7 +36,7 @@ for filename in glob.glob(dataset_path+"/*.json"):
             ustr_to_load = unicode(read_line, 'iso-8859-15')
             continue
         else:     
-            if json_line["entities"]["user_mentions"]:
+            if json_line["entities"]["user_mentions"] and json_line["user"]["screen_name"]:
                 len_ment=len(json_line["entities"]["user_mentions"])
                 dt=dateutil.parser.parse(json_line["created_at"])
                 mytime=int(time.mktime(dt.timetuple()))
