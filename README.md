@@ -2,7 +2,7 @@ community-evolution-analysis
 ============================
 
 ###A framework for the analysis of social interaction networks (e.g. induced by Twitter mentions) in time.
-We make available a Twitter interaction network collector and a set of Matlab scripts that enable the analysis of social interaction networks with the goal of uncovering evolving communities. More specifically, the interaction network collector forms a network between Twitter users based on the mentions in the set of monitored tweets (using the Streaming API). The network of interactions is adaptively partitioned into snapshot graphs based on the frequency of interactions. Then, each graph snapshot is partitioned into communities using the Louvain method [2]. Dynamic communities are extracted by matching the communities of the current graph snapshot to communities of previous snapshot. Finally, these dynamic communities are ranked and presented to the user in accordance to three factors; stability, peristence and community centrality. The user can browse through these communities in which the users are also ranked in accordance to their own specific snapshot centrality. The PageRank algorithm [3] is used to measure the feature of centrality.
+We make available a Twitter interaction network collector and a set of Matlab and Python scripts that enable the analysis of social interaction networks with the goal of uncovering evolving communities. More specifically, the interaction network collector forms a network between Twitter users based on the mentions in the set of monitored tweets (using the Streaming API). The network of interactions is adaptively partitioned into snapshot graphs based on the frequency of interactions. Then, each graph snapshot is partitioned into communities using the Louvain method [2]. Dynamic communities are extracted by matching the communities of the current graph snapshot to communities of previous snapshot. Finally, these dynamic communities are ranked and presented to the user in accordance to three factors; stability, persistence and community centrality. The user can browse through these communities in which the users are also ranked in accordance to their own specific snapshot centrality. The PageRank algorithm [3] is used to measure the feature of centrality.
 
 * The master branch of this repository contains ongoing matlab and python files which form the current stable version of the framework. 
 * The _"pci13"_ branch contains all the code and data needed to replicate the experiments performed in [1].
@@ -16,9 +16,8 @@ We make available a Twitter interaction network collector and a set of Matlab sc
 This distribution contains the following:  
 * a readme.txt file with instructions on how to use the different parts of the framework;
 * a data collector (in the /crawler folder) that makes use of the Twitter Streaming API to collect mention networks between Twitter users;
-* a set of Python scripts (in the /python folder) that are used to parse the json files retrieved by the data collector in a "Matlab friendly" form.
-* a set of Matlab scripts (in the /matlab folder) that are used to conduct community evolution analysis.
-
+* a set of Python scripts (in the /python folder) that are used to conduct community evolution analysis.
+* a set of Matlab scripts (in the /matlab folder) that are used to conduct community evolution analysis and a set of Python scripts (in the /matlab/python_data_parsing folder) that are used to parse the json files retrieved by the data collector in a "Matlab friendly" form.
 
 ##Data##
 In the case where the user has data from a different source other than the provided crawler, in order for the python files to work, the data should either be in a json twitter-like form  (the "entities", "user" and "created\_at" keys and paths should be identical with twitter's) or in a txt file of the form:
@@ -38,8 +37,23 @@ In order to retrieve the full json of the tweet type:
 The crawler returns _testnet.txt.#_ and _rawmetadata.json.#_ files which should be processed by the corresponding python script in order to be able to perform the analysis using the matlab files.
 The python resulting txt file should be added to the _../data/_ folder.  
 
-##json Parsing (Python)##
-The python code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with the jsons extracted from the crawler and 4 files to be used with jsons from any other Twitter API dependant source.  
+##Evolution analysis using Python##
+Any new data to be analysed should be placed in the _../data/json/_ folder for json files and in the _../data/txt/_ folder for txt files.
+The python code consists of 3 files containing friendly user scripts for performing Community Evolution Analysis from json and txt files acquired from the Twitter social network.
+
+This folder contains 3 files:
+* <code>main.py</code>  
+    This .py file is used to provide a guideline to the user as to how to use framework.
+* <code>community.py</code>  
+    This is a copy of Aynaud's implementation of the Louvain community detection algorithm.
+* <code>CommunityRanking.py</code>  
+    This .py file contains the Evolution Analysis Framework.
+	
+##Evolution analysis using Matlab##
+Any new data to be analysed should be placed in the _../data/_ folder  
+
+###Step1: json Parsing (Python)###
+The python parsing code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with the jsons extracted from the crawler and 4 files to be used with jsons from any other Twitter API dependant source.  
 More specifically, they are used to create txt files which contain the mentions entries between twitter users as well as the time at which these mentions were made and the context in which they were included.  
 
 The json_mention_multifile* files provide as many txt files as there are json files. 
@@ -67,10 +81,9 @@ This folder contains 12 files:
 * <code>txt\_mention\_matlab\_singleFile\_parser.py & txt\_mention\_matlab\_singleFile\_noDialog\_parser.py</code>  
     These files are used when the user has *.txt files from another source.  
 
-The resulting authors\_mentions\_time.txt file should be added to the _../data/_ folder. 
-    
-##Evolution analysis (Matlab)##
-Any new data to be analysed should be placed in the _../data/_ folder  
+The resulting authors\_mentions\_time.txt file should be added to the _../data/_ folder.
+
+###Step2: Evolution Analysis (Matlab)###
 The matlab code consists of 13 files which can either work as standalone scripts, or as functions of the _main.m_ script. 
 The only thing that needs changing is a comment of the function line in each of the m-files (instructions are included in the m-files).  
 These 13 files are:  
@@ -103,7 +116,7 @@ This .m file provides an analysis of the communities in respect to their evoluti
 
 There are also 4 assistive functions which are used to extract the position of each user in the adjacency matrix (_pos\_aloc\_of\_usrs.m_), to create the adjacency matrix (_adj\_mat\_creator.m_), to perform the community detection (_comm\_detect\_louvain.m_) and to extract the centrality of each user using the pagerank algorithm (_mypagerank.m_).
 
-##Results##
+###Matlab Results###
 The final outcome is a cell array in ../data/mats/signifComms.mat containing the most significant dynamic communities, their users and the centrality of the users.
 _.../data/mats/commEvol.mat_ and _.../data/mats/commEvolSize.mat_ are also useful as they present the evolution of the communities and the community sizes respectfully.
 A heatmap presenting the evolution and size of all evolving communities is also produced giving the user an idea of the bigger picture (../data/figures/).
