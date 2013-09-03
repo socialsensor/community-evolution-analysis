@@ -15,22 +15,8 @@ We make available a Twitter interaction network collector and a set of Matlab an
 ##Distribution Information##
 This distribution contains the following:  
 * a readme.txt file with instructions on how to use the different parts of the framework;
-* a data collector (in the /crawler folder) that makes use of the Twitter Streaming API to collect mention networks between Twitter users;
 * a set of Python scripts (in the /python folder) that are used to conduct community evolution analysis.
 * a set of Matlab scripts (in the /matlab folder) that are used to conduct community evolution analysis and a set of Python scripts (in the /matlab/python_data_parsing folder) that are used to parse the json files retrieved by the data collector in a "Matlab friendly" form.
-
-##Crawler##
-Before using the crawler, the user should go on http://dev.twitter.com, set up an account and create a new application. S/he should then acquire the _Consumer key_, the _Consumer secret_, _Access token_ and the _Access token secret_ which should be manually inserted into the _../crawler/crawl.xml_ file.  
-The crawling is done though a _jar_ file in the crawler folder using the following command in the command prompt:
-
-    java -jar retriever.jar --mentionet testnet.txt --keywords keywords.txt
-
-In order to retrieve the full json of the tweet type:  
-
-    java -jar retriever.jar --mentionet testnet.txt --keywords keywords.txt -file rawmetadata.json 
-
-The crawler returns _testnet.txt.#_ and _rawmetadata.json.#_ files which should be processed by the corresponding python script in order to be able to perform the analysis using the matlab files.
-The python resulting txt file should be added to the _../data/_ folder.  
 
 ##Evolution analysis using Python##
 
@@ -55,12 +41,12 @@ The framework provides the user with 5 pieces of resulting data in the _../data/
 ##Evolution analysis using Matlab##
 
 Any new data to be analysed should be placed in the _../data/_ folder 
-In the case where the user has data from a different source other than the provided crawler, in order for the python files to work, the data should either be in a json twitter-like form  (the "entities", "user" and "created\_at" keys and paths should be identical with twitter's) or in a txt file of the form:
+In the case where the user has data from a different source, in order for the python files to work, the data should either be in a json twitter-like form  (the "entities", "user" and "created\_at" keys and paths should be identical with twitter's) or in a txt file of the form:
 
     user1 \TAB user2,user3... \TAB "created_at_timestamp" \TAB text \newline  
 
 ###Step1: json Parsing (Python)###
-The python parsing code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with the json files extracted from the crawler and 4 files to be used with jsons from any other Twitter API dependant source.  
+The python parsing code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with jsons from any other Twitter API dependant source.  
 More specifically, they are used to create txt files which contain the mentions entries between twitter users as well as the time at which these mentions were made and the context in which they were included.  
 
 The json_mention_multifile* files provide as many txt files as there are json files. 
@@ -75,16 +61,10 @@ required to perform the community analysis efficiently. They contain information
     user1 \TAB user3 \TAB unix_timestamp \TAB \newline
 
 This folder contains 12 files:
-* <code>json\_mention\_multifile\_crawler.py & json\_mention\_matlab\_singleFile_crawler.py</code>  
-    These .py files are used to parse rawmetadata.json.# files straight from the crawler. (The files should be moved to a new folder before parsing commenses)
-* <code>json_mention\_multifile\_noDialog_crawler.py & json\_mention\_matlab\_singleFile_noDialog_crawler.py</code>  
-    These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
 * <code>json\_mention\_multifile\_parser.py & json\_mention\_matlab\_singleFile_parser.py</code>  
-    These files are used when the user has *.json files from another source.
+    These files are used when the user has *.json files.
 * <code>json\_mention\_multifile\_noDialog\_parser.py & json\_mention\_matlab\_singleFile\_noDialog_parser.py</code>  
     These are similar to the previous files but the dataset folder path has to be inserted manually (Does not require the wxPython GUI toolkit).
-* <code>txt\_mention\_matlab\_singleFile\_crawler.py & txt\_mention\_matlab\_singleFile\_noDialog\_crawler.py</code>  
-    These .py files are used to parse testnet.txt.# files straight from the crawler. (The files should be moved to a new folder before parsing commenses)
 * <code>txt\_mention\_matlab\_singleFile\_parser.py & txt\_mention\_matlab\_singleFile\_noDialog\_parser.py</code>  
     These files are used when the user has *.txt files from another source.  
 
