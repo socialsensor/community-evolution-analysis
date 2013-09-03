@@ -19,11 +19,6 @@ This distribution contains the following:
 * a set of Python scripts (in the /python folder) that are used to conduct community evolution analysis.
 * a set of Matlab scripts (in the /matlab folder) that are used to conduct community evolution analysis and a set of Python scripts (in the /matlab/python_data_parsing folder) that are used to parse the json files retrieved by the data collector in a "Matlab friendly" form.
 
-##Data##
-In the case where the user has data from a different source other than the provided crawler, in order for the python files to work, the data should either be in a json twitter-like form  (the "entities", "user" and "created\_at" keys and paths should be identical with twitter's) or in a txt file of the form:
-
-    user1 \TAB user2,user3... \TAB "created_at_timestamp" \TAB text \newline  
-
 ##Crawler##
 Before using the crawler, the user should go on http://dev.twitter.com, set up an account and create a new application. S/he should then acquire the _Consumer key_, the _Consumer secret_, _Access token_ and the _Access token secret_ which should be manually inserted into the _../crawler/crawl.xml_ file.  
 The crawling is done though a _jar_ file in the crawler folder using the following command in the command prompt:
@@ -38,9 +33,13 @@ The crawler returns _testnet.txt.#_ and _rawmetadata.json.#_ files which should 
 The python resulting txt file should be added to the _../data/_ folder.  
 
 ##Evolution analysis using Python##
+
 Any new data (json files) to be analysed should be placed in the _../data/json/_ folder.
+In order for the python files to work, the data should be in a json twitter-like form  (the "entities", "user" and "created\_at" keys and paths should be identical with twitter's).
+
+###Code###
 The python code consists of 3 files containing friendly user scripts for performing Community Evolution Analysis from json and txt files acquired from the Twitter social network.
-The framework was implemented using Python 3.3 and the 3rd party libraries required for the framework to work are _dateutil_ (requires pyparsing), _numpy_, _matplotlib_ and _networkx_ (http://www.lfd.uci.edu/~gohlke/pythonlibs/). 
+The framework was implemented using Python 3.3 and the 3rd party libraries required for the framework to work are _dateutil_ (requires _pyparsing_), _numpy_, _matplotlib_ and _networkx_ (http://www.lfd.uci.edu/~gohlke/pythonlibs/). 
 
 The python folder contains 3 files:
 * <code>main.py</code>  
@@ -54,7 +53,11 @@ The python folder contains 3 files:
 The framework provides the user with 5 pieces of resulting data in the _../data/results/_ folder: a) the user_activity.eps file which presents the user mentioning activity according to the selected sampling interval, b) usersPairs_(num).txt files which can be used with the Gephi visualization software in order to view the praphs, c) the rankedcommunities variable (from main.py) which contains all the communities (and their users) which evolved ranked in accordance to the persistence, stability and community centrality triplet, d) the community size heatmap (communitySizeHeatmap.eps) which provides a visualization of the sizes of the 100 most important communities (ranked from top to bottom) and e) the rankedCommunities.json file which contains all the ranked communities along with all the information regarding the specific timeslot of evolution for each community, the persistence, stability and community centrality values and all the users in each community accompanied by their own centrality measure. As such, the framework can be used to discover the most important communities along with the most important users inside those communities.
 
 ##Evolution analysis using Matlab##
-Any new data to be analysed should be placed in the _../data/_ folder  
+
+Any new data to be analysed should be placed in the _../data/_ folder 
+In the case where the user has data from a different source other than the provided crawler, in order for the python files to work, the data should either be in a json twitter-like form  (the "entities", "user" and "created\_at" keys and paths should be identical with twitter's) or in a txt file of the form:
+
+    user1 \TAB user2,user3... \TAB "created_at_timestamp" \TAB text \newline  
 
 ###Step1: json Parsing (Python)###
 The python parsing code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with the json files extracted from the crawler and 4 files to be used with jsons from any other Twitter API dependant source.  
