@@ -38,22 +38,26 @@ The crawler returns _testnet.txt.#_ and _rawmetadata.json.#_ files which should 
 The python resulting txt file should be added to the _../data/_ folder.  
 
 ##Evolution analysis using Python##
-Any new data to be analysed should be placed in the _../data/json/_ folder for json files and in the _../data/txt/_ folder for txt files.
+Any new data (json files) to be analysed should be placed in the _../data/json/_ folder.
 The python code consists of 3 files containing friendly user scripts for performing Community Evolution Analysis from json and txt files acquired from the Twitter social network.
+The framework was implemented using Python 3.3 and the 3rd party libraries required for the framework to work are _dateutil_ (requires pyparsing), _numpy_, _matplotlib_ and _networkx_ (http://www.lfd.uci.edu/~gohlke/pythonlibs/). 
 
-This folder contains 3 files:
+The python folder contains 3 files:
 * <code>main.py</code>  
-    This .py file is used to provide a guideline to the user as to how to use framework.
+    This .py file is used to provide a guideline to the user as to how to use the framework (CommunityRanking.py file).
 * <code>community.py</code>  
     This is a copy of Aynaud's implementation of the Louvain community detection algorithm.
 * <code>CommunityRanking.py</code>  
     This .py file contains the Evolution Analysis Framework.
-	
+
+###Python Results###
+The framework provides the user with 5 pieces of resulting data in the _../data/results/_ folder: a) the user_activity.eps file which presents the user mentioning activity according to the selected sampling interval, b) usersPairs_(num).txt files which can be used with the Gephi visualization software in order to view the praphs, c) the rankedcommunities variable (from main.py) which contains all the communities (and their users) which evolved ranked in accordance to the persistence, stability and community centrality triplet, d) the community size heatmap (communitySizeHeatmap.eps) which provides a visualization of the sizes of the 100 most important communities (ranked from top to bottom) and e) the rankedCommunities.json file which contains all the ranked communities along with all the information regarding the specific timeslot of evolution for each community, the persistence, stability and community centrality values and all the users in each community accompanied by their own centrality measure. As such, the framework can be used to discover the most important communities along with the most important users inside those communities.
+
 ##Evolution analysis using Matlab##
 Any new data to be analysed should be placed in the _../data/_ folder  
 
 ###Step1: json Parsing (Python)###
-The python parsing code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with the jsons extracted from the crawler and 4 files to be used with jsons from any other Twitter API dependant source.  
+The python parsing code consists of 8 files containing user friendly scripts for parsing the required data from json files. There are 4 files to be used with the json files extracted from the crawler and 4 files to be used with jsons from any other Twitter API dependant source.  
 More specifically, they are used to create txt files which contain the mentions entries between twitter users as well as the time at which these mentions were made and the context in which they were included.  
 
 The json_mention_multifile* files provide as many txt files as there are json files. 
