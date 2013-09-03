@@ -60,7 +60,7 @@ required to perform the community analysis efficiently. They contain information
     user1 \TAB user2 \TAB unix_timestamp \TAB \newline
     user1 \TAB user3 \TAB unix_timestamp \TAB \newline
 
-This folder contains 12 files:
+This folder contains 6 files:
 * <code>json\_mention\_multifile\_parser.py & json\_mention\_matlab\_singleFile_parser.py</code>  
     These files are used when the user has *.json files.
 * <code>json\_mention\_multifile\_noDialog\_parser.py & json\_mention\_matlab\_singleFile\_noDialog_parser.py</code>  
