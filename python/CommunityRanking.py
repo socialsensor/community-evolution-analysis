@@ -239,7 +239,6 @@ class communityranking:
         commIds=[]
         # name the first line of communities
         commIds.append([])
-        commIds.append([])
         birthcounter=0
         for j in range(lC[0]):
             # commIds[str(0)+","+str(j)]=str(0)+','+str(j)
@@ -250,8 +249,7 @@ class communityranking:
         tempUniCommIds,evolcounter,uniCommIdsEvol=[],0,{}
         for rows in range(1,timeslots):
             print('Community similarity search for timeslot: '+str(rows))
-            rowmax,commIds[rows]=[],[]
-            rowmax=[]
+##            commIds[rows]=[]
             commIds.append([])
             for clmns in range(lC[rows]):
                 idx=str(rows)+","+str(clmns)
@@ -275,6 +273,7 @@ class communityranking:
                             if thres>(len(prevComms)/tempcommSize):
                                 break
                             elif thres>(tempcommSize/len(prevComms)):
+                                tmpsim.append(0)
                                 continue
                             else:
                                 tmpsim.append(len(list(set(bag1) & set(prevComms)))/len(set(np.append(bag1,prevComms))))
@@ -288,14 +287,14 @@ class communityranking:
                             tempUniCommIds.append(commIds[prevrow][maxIdx])
                             if commIds[prevrow][maxIdx] not in uniCommIdsEvol:
                                 uniCommIdsEvol[commIds[prevrow][maxIdx]]=[[],[],[],[]]
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][0].append(prevrow)
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[prevrow][maxIdx])
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[prevrow][maxIdx])
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[prevrow][maxIdx])
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][0].append(rows)
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[rows][clmns])
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[rows][clmns])
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[rows][clmns])
+                                uniCommIdsEvol[commIds[prevrow][maxIdx]][0].append(prevrow)#timeslot num for first evolution
+                                uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[prevrow][maxIdx])#community pagerank for first evolution
+                                uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[prevrow][maxIdx])#community size per timeslot for first evolution
+                                uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[prevrow][maxIdx])#users in each community for first evolution
+                            uniCommIdsEvol[commIds[prevrow][maxIdx]][0].append(rows)#timeslot num
+                            uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[rows][clmns])#community pagerank
+                            uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[rows][clmns])#community size per timeslot
+                            uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[rows][clmns])#users in each community
                             commIds[rows].append(commIds[prevrow][maxIdx])
                             break
                 if maxval<thres:
@@ -309,12 +308,11 @@ class communityranking:
         tempcommRanking={}
         #structure: tempcommRanking={Id:[persistence,stability,commCentrality]}
         for Id in uniCommIds:
-            # clmnIdx = [i for i, elem in enumerate(commIds) if Id in elem]
             timeSlLen=len(set(uniCommIdsEvol[Id][0]))
             tempcommRanking[Id]=[]
-            tempcommRanking[Id].append(timeSlLen/timeslots)
-            tempcommRanking[Id].append((sum(np.diff(list(set(uniCommIdsEvol[Id][0])))==1)+1)/(timeslots+1))
-            tempcommRanking[Id].append(sum(uniCommIdsEvol[Id][1])/timeSlLen)
+            tempcommRanking[Id].append(timeSlLen/timeslots)#persistence
+            tempcommRanking[Id].append((sum(np.diff(list(set(uniCommIdsEvol[Id][0])))==1)+1)/(timeslots+1))#stability
+            tempcommRanking[Id].append(sum(uniCommIdsEvol[Id][1])/timeSlLen)#commCentrality
         #calculate maxs in for everything
         maxP=max((p for k,(p,s,c) in tempcommRanking.items()))
         maxS=max((s for k,(p,s,c) in tempcommRanking.items()))
@@ -335,7 +333,10 @@ class communityranking:
         commSizeHeatData=np.zeros([len(rankedCommunities),timeslots])
         for rCIdx,comms in enumerate(rankedCommunities[0:100]):
             for sizeIdx,timesteps in enumerate(uniCommIdsEvol[comms][0]):
-                commSizeHeatData[rCIdx,timesteps]=uniCommIdsEvol[comms][2][sizeIdx]
+                if commSizeHeatData[rCIdx,timesteps]!=0:
+                    commSizeHeatData[rCIdx,timesteps]=max(uniCommIdsEvol[comms][2][sizeIdx],commSizeHeatData[rCIdx,timesteps])
+                else:
+                    commSizeHeatData[rCIdx,timesteps]=uniCommIdsEvol[comms][2][sizeIdx]
         fig, ax = plt.subplots()
         heatmap=ax.pcolormesh(commSizeHeatData,cmap=plt.cm.gist_gray_r)
         ax.set_xticks(np.arange(commSizeHeatData.shape[1]+0.5), minor=False)
@@ -359,7 +360,7 @@ class communityranking:
             jsondata=[]
             for rank,rcomms in enumerate(rankedCommunities):
                 tmslUsrs=[]
-                rankedCommunitiesFinal[rank]=uniCommIdsEvol[rcomms]
+                rankedCommunitiesFinal[rank]=[rcomms]
                 rankedCommunitiesFinal[rank].append(uniCommIdsEvol[rcomms][3])
                 for tmsl,users in enumerate(uniCommIdsEvol[rcomms][3]):
                     uscentr=[]
@@ -367,7 +368,7 @@ class communityranking:
                         uscentr.append({us:self.userPgRnkBag[uniCommIdsEvol[rcomms][0][tmsl]][us]})
                     tmslUsrs.append({uniCommIdsEvol[rcomms][0][tmsl]:uscentr})
                 jsondata=({'community label':rcomms,'rank':rank+1,'timeslot appearance':uniCommIdsEvol[rcomms][0],'persistence:':tempcommRanking[rcomms][0],
-                'stability':tempcommRanking[rcomms][1],'community centrality':tempcommRanking[rcomms][2],'users:centrality for timeslot':tmslUsrs})
+                'stability':tempcommRanking[rcomms][1],'community centrality':tempcommRanking[rcomms][2],'community size per slot':uniCommIdsEvol[rcomms][2],'users:centrality for timeslot':tmslUsrs})
                 json.dump(jsondata, fl)
                 fl.write('\n')
         return rankedCommunitiesFinal
