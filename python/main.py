@@ -19,7 +19,7 @@ from CommunityRanking import communityranking
 ##dataset_path = tkinter.filedialog.askdirectory(parent=root,initialdir="f:/Dropbox/ITI/python/community_analysis_framework/",title='Please select a directory')
 # User sets json dataset and target folder
 #C:/Users/konkonst/Desktop/myDropBox
-dataset_path = "d:/Dropbox/ITI/python/community_analysis_framework/budget_UKEcon6"
+dataset_path = "f:/Dropbox/ITI/python/community_analysis_framework/budget_UKEcon6"
 timeSeg=[600, 900, 1200, 1800, 2700, 3600]
 data=communityranking.from_path(dataset_path,timeSeg)
 rankedCommunities=data.evol_detect()

@@ -28,8 +28,8 @@ class communityranking:
     @classmethod
     def from_path(cls,dataset_path,timeSeg):
         '''Make temp folder if non existant'''
-        if not os.path.exists(dataset_path+"/data/results"):
-            os.makedirs(dataset_path+"/data/results")
+        if not os.path.exists(dataset_path+"/data/results/forGephi"):
+            os.makedirs(dataset_path+"/data/results/forGephi")
 
         '''Parse the json files into authors/mentions/alltime lists'''
         authors,mentions,alltime=[],[],[]
@@ -83,7 +83,7 @@ class communityranking:
         for k in range(len(mentionLimit)):
             if firstderiv[k]<0 and firstderiv[k+1]>=0:
                 fileNum='{0}'.format(str(timeslot).zfill(2))
-                my_txt=open(self.dataset_path+"/data/results/usersPairs_"+fileNum+".txt","w")
+                my_txt=open(self.dataset_path+"/data/results/forGephi/usersPairs_"+fileNum+".txt","w")
                 print("Forming Timeslot Data "+str(timeslot)+" at point "+str(k))
                 sesEnd=int(mentionLimit[k]+1)
                 #Write pairs of users to txt file for later use
@@ -339,12 +339,12 @@ class communityranking:
                     commSizeHeatData[rCIdx,timesteps]=uniCommIdsEvol[comms][2][sizeIdx]
         fig, ax = plt.subplots()
         heatmap=ax.pcolormesh(commSizeHeatData,cmap=plt.cm.gist_gray_r)
-        ax.set_xticks(np.arange(commSizeHeatData.shape[1]+0.5), minor=False)
-        ax.set_yticks(np.arange(commSizeHeatData.shape[0]+0.5), minor=False)
+        ax.set_xticks(np.arange(commSizeHeatData.shape[1]), minor=False)
+        ax.set_yticks(np.arange(commSizeHeatData.shape[0]), minor=False)
         plt.xlim(xmax=(timeslots))
         plt.ylim(ymax=(len(rankedCommunities[0:100])))
         plt.ylabel("Ranked Communities (1st 100)")
-        plt.xlabel("Timeslot")
+        plt.xlabel('Timeslot',{'verticalalignment':'top'})
         ax.invert_yaxis()
         ax.xaxis.tick_top()
         ax.set_xticklabels(row_labels, minor=False)
@@ -356,19 +356,22 @@ class communityranking:
         plt.close()
         '''Writing ranked communities to json files'''
         rankedCommunitiesFinal={}
-        with open(self.dataset_path+'/data/results/rankedCommunities.json', 'w') as fl:
-            jsondata=[]
-            for rank,rcomms in enumerate(rankedCommunities):
-                tmslUsrs=[]
-                rankedCommunitiesFinal[rank]=[rcomms]
-                rankedCommunitiesFinal[rank].append(uniCommIdsEvol[rcomms][3])
-                for tmsl,users in enumerate(uniCommIdsEvol[rcomms][3]):
-                    uscentr=[]
-                    for us in users:
-                        uscentr.append({us:self.userPgRnkBag[uniCommIdsEvol[rcomms][0][tmsl]][us]})
-                    tmslUsrs.append({uniCommIdsEvol[rcomms][0][tmsl]:uscentr})
-                jsondata=({'community label':rcomms,'rank':rank+1,'timeslot appearance':uniCommIdsEvol[rcomms][0],'persistence:':tempcommRanking[rcomms][0],
-                'stability':tempcommRanking[rcomms][1],'community centrality':tempcommRanking[rcomms][2],'community size per slot':uniCommIdsEvol[rcomms][2],'users:centrality for timeslot':tmslUsrs})
-                json.dump(jsondata, fl)
-                fl.write('\n')
+        twitterDataFile = open(self.dataset_path+'/data/results/rankedCommunities.json', "w")
+        jsondata=dict()
+        jsondata["ranked_communities"]=[]
+        for rank,rcomms in enumerate(rankedCommunities):
+            tmslUsrs=[]
+            strRank='{0}'.format(str(rank).zfill(2))
+            rankedCommunitiesFinal[strRank]=[rcomms]
+            rankedCommunitiesFinal[strRank].append(commRanking[rcomms])
+            rankedCommunitiesFinal[strRank].append(uniCommIdsEvol[rcomms][3])
+            for tmsl,users in enumerate(uniCommIdsEvol[rcomms][3]):
+                uscentr=[]
+                for us in users:
+                    uscentr.append({us:self.userPgRnkBag[uniCommIdsEvol[rcomms][0][tmsl]][us]})
+                tmslUsrs.append({uniCommIdsEvol[rcomms][0][tmsl]:uscentr})
+            jsondata["ranked_communities"].append({'community label':rcomms,'rank':rank+1,'timeslot appearance':uniCommIdsEvol[rcomms][0],'persistence:':tempcommRanking[rcomms][0],
+            'stability':tempcommRanking[rcomms][1],'community centrality':tempcommRanking[rcomms][2],'community size per slot':uniCommIdsEvol[rcomms][2],'users:centrality for timeslot':tmslUsrs})
+        twitterDataFile.write(json.dumps(jsondata, sort_keys=True))
+        twitterDataFile.close()
         return rankedCommunitiesFinal
