@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:
 # Purpose:       This .py file extracts adjacency lists and detects communities
@@ -11,7 +12,7 @@
 # Copyright:     (c) ITI (CERTH) 2013
 # Licence:       <apache licence 2.0>
 #-------------------------------------------------------------------------------
-import json,codecs,os,glob,time,dateutil.parser,community,collections,itertools
+import json,codecs,os,glob,time,dateutil.parser,community,collections,itertools,datetime
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import interactive
@@ -22,65 +23,91 @@ class communityranking:
     @classmethod
     def from_json(cls,dataset_path,timeSeg,simplify_json):
         '''Make temp folder if non existant'''
-        if not os.path.exists(dataset_path+"/data/results/forGephi"):
-            os.makedirs(dataset_path+"/data/results/forGephi")
-        if not os.path.exists(dataset_path+"/data/results/simplified_json"):
-            os.makedirs(dataset_path+"/data/results/simplified_json")
+        if not os.path.exists(dataset_path+"/data/GDD/results/forGephi"):
+            os.makedirs(dataset_path+"/data/GDD/results/forGephi")
+        if not os.path.exists(dataset_path+"/data/GDD/results/simplified_json"):
+            os.makedirs(dataset_path+"/data/GDD/results/simplified_json")
 
         #Get filenames from json dataset path
-        files = glob.glob(dataset_path+"/data/json/*.json")
+        files = glob.glob(dataset_path+"/data/GDD/json/*.json")
         files.sort(key=os.path.getmtime)
-        '''Parse the json files into authors/mentions/alltime/tags lists'''
-        authors,mentions,alltime,tags=[],[],[],[]
-        counter=0
+
+        '''Parse the json files into authors/mentions/alltime/tags/tweetIds/text lists'''
+        authors,mentions,alltime,tags,tweetIds,twText,tweetUrls=[],[],[],[],[],[],[]
+        counter,totTweets,totMentTws,totNonMentTws,totMents,hashes,urlCount=0,0,0,0,0,0,0
         for filename in files:
             if simplify_json==1:
-                my_txt=open(dataset_path+"/data/results/simplified_json/auth_ment_time_text_"+str(counter)+".txt","w")#file containing author mentioned time text
+                my_txt=open(dataset_path+"/data/GDD/results/simplified_json/auth_ment_time_text_"+str(counter)+".txt","w")#file containing author mentioned time text
                 counter+=1
-            print(filename)
+            # print(filename)
             my_file=open(filename,"r")
             read_line=my_file.readline()
+            totTweets+=1
             while read_line:
                 json_line=json.loads(read_line)
                 if "delete" in json_line or "scrub_geo" in json_line or "limit" in json_line:
                     read_line=my_file.readline()
+                    totTweets+=1
                     continue
                 else:
                     if json_line["entities"]["user_mentions"] and json_line["user"]["screen_name"]:
+                        totMentTws+=1
                         len_ment=len(json_line["entities"]["user_mentions"])
                         dt=dateutil.parser.parse(json_line["created_at"])
                         mytime=int(time.mktime(dt.timetuple()))
                         tmpMents=[]
                         for i in range(len_ment):
+                            totMents+=1
                             authors.append(json_line["user"]["screen_name"])
                             mentions.append(json_line["entities"]["user_mentions"][i]["screen_name"])
                             alltime.append(mytime)
                             tmpMents.append(json_line["entities"]["user_mentions"][i]["screen_name"])
+                            tweetIds.append(json_line["id_str"])
+                            twText.append(json_line['text'])
                             if json_line["entities"]["hashtags"]:
                                 tmp=[]
                                 for textIdx in json_line["entities"]["hashtags"]:
+                                    hashes+=1
                                     tmp.append(textIdx["text"])
                                 tags.append(tmp)
                             else:
                                 tags.append([])
+                            if json_line["entities"]["urls"]:
+                                tmp=[]
+                                for textIdx in json_line["entities"]["urls"]:
+                                    urlCount+=1
+                                    tmp.append(textIdx["expanded_url"])
+                                tweetUrls.append(tmp)
+                            else:
+                                tweetUrls.append([])
                         if simplify_json==1:
-                            my_text=json_line["text"].replace("\n", "")
-                            my_txt.write(json_line["user"]["screen_name"]+"\t" + ",".join(tmpMents)+"\t"+"\""+json_line["created_at"]+"\""+"\t"+str(my_text.encode('utf-8'))+"\n")
+                            my_text=json_line["text"].replace("\n","").replace('\u200F',"").replace('\u2033',"").replace('\u20aa',"").replace('\x92',"").replace('\u200b',"").replace('\u200e',"").replace('\u203c',"")
+##                            print(my_text)
+                            my_txt.write(json_line["user"]["screen_name"]+"\t" + ",".join(tmpMents)+"\t"+"\""+json_line["created_at"]+"\""+"\t"+str(my_text)+"\n")
+                    else:
+                        totNonMentTws+=1
                 read_line=my_file.readline()
+                totTweets+=1
             else:
                 my_file.close()
                 if simplify_json==1:
                     my_txt.close()
-        return cls(authors,mentions,alltime,tags,dataset_path,timeSeg)
+        print('Total # of Tweets= '+str(totTweets)+
+        '\nTotal # of Tweets with mentions: '+str(totMentTws)+
+        '\nTotal # of Tweets without mentions: '+str(totNonMentTws)+
+        '\nTotal # of mentions: '+str(totMents)+
+        '\nTotal # of hashtags: '+str(hashes)+
+        '\nTotal # of urls: '+str(urlCount))
+        return cls(authors,mentions,alltime,tags,tweetIds,twText,tweetUrls,dataset_path,timeSeg)
 
     @classmethod
     def from_txt(cls,dataset_path,timeSeg):
         '''Make temp folder if non existant'''
-        if not os.path.exists(dataset_path+"/data/results/forGephi"):
-            os.makedirs(dataset_path+"/data/results/forGephi")
+        if not os.path.exists(dataset_path+"/data/GDD/results/forGephi"):
+            os.makedirs(dataset_path+"/data/GDD/results/forGephi")
 
         #Get filenames from txt dataset path
-        files = glob.glob(dataset_path+"/data/txt/*.txt")
+        files = glob.glob(dataset_path+"/data/GDD/txt/*.txt")
         files.sort(key=os.path.getmtime)
 
         '''Parse the txt files into authors/mentions/alltime lists'''
@@ -105,11 +132,14 @@ class communityranking:
                 my_file.close()
         return cls(authors,mentions,alltime,tags,dataset_path,timeSeg)
 
-    def __init__(self,authors,mentions,alltime,tags,dataset_path,timeSeg):
+    def __init__(self,authors,mentions,alltime,tags,tweetIds,twText,tweetUrls,dataset_path,timeSeg):
         self.authors=authors
         self.mentions=mentions
         self.alltime=alltime
         self.tags=tags
+        self.tweetIds=tweetIds
+        self.twText=twText
+        self.tweetUrls=tweetUrls
         self.dataset_path=dataset_path
         self.timeSeg=timeSeg
         self.uniqueUsers={}
@@ -119,6 +149,9 @@ class communityranking:
         self.commStrBag={}
         self.commNumBag={}
         self.tagBag={}
+        self.tweetIdBag={}
+        self.tweetTextBag={}
+        self.urlBag={}
         self.rankedCommunities={}
 
     def extraction(self):
@@ -128,12 +161,14 @@ class communityranking:
         firstderiv,mentionLimit=self.timeslotselection(self.authors,self.mentions,self.alltime)
 
         #Split time according to the first derivative of the users' activity#
-        sesStart,timeslot=0,0
+        sesStart,timeslot,timeLimit=0,0,[]
+        print("Forming timeslots")
         for k in range(len(mentionLimit)):
             if firstderiv[k]<0 and firstderiv[k+1]>=0:
-                t = time.time()
+                #make timeslot timelimit array
+                timeLimit.append(self.alltime[int(mentionLimit[k])])
                 fileNum='{0}'.format(str(timeslot).zfill(2))
-                print("Forming Timeslot Data "+str(timeslot)+" at point "+str(k))
+                # print("Forming Timeslot Data "+str(timeslot)+" at point "+str(k))
                 sesEnd=int(mentionLimit[k]+1)
 
                 #Make pairs of users with weights
@@ -147,7 +182,7 @@ class communityranking:
                 adjList=list(zip(adjauthors,adjments,weights))
 
                 #Write pairs of users to txt file for Gephi
-                my_txt=open(self.dataset_path+"/data/results/forGephi/usersPairs_"+fileNum+".txt","w")
+                my_txt=open(self.dataset_path+"/data/GDD/results/forGephi/usersPairs_"+fileNum+".txt","w")
                 my_txt.write("Source,Target,Weight"+"\n")
                 for line in adjList:
                     my_txt.write(",".join(str(x) for x in line) + "\n")
@@ -161,6 +196,46 @@ class communityranking:
                         self.tagBag[timeslot][auth]=[]
                     elif tmptags[authIdx]:
                         self.tagBag[timeslot][auth].append(tmptags[authIdx])
+
+                #create dictionary of urls per user
+                tmpUrls=self.tweetUrls[sesStart:sesEnd]
+                self.urlBag[timeslot]={}
+                for authIdx,auth in enumerate(self.authors[sesStart:sesEnd]):
+                    if auth not in self.urlBag[timeslot]:
+                        self.urlBag[timeslot][auth]=[]
+                    elif tmpUrls[authIdx]:
+                        self.urlBag[timeslot][auth].append(tmpUrls[authIdx])
+
+                #create dictionary of tweet Ids per user
+                tmptweetids=self.tweetIds[sesStart:sesEnd]
+                self.tweetIdBag[timeslot]={}
+                for authIdx,auth in enumerate(self.authors[sesStart:sesEnd]):
+                    if auth not in self.tweetIdBag[timeslot]:
+                        self.tweetIdBag[timeslot][auth]=[]
+                    elif tmptweetids[authIdx]:
+                        self.tweetIdBag[timeslot][auth].append(tmptweetids[authIdx])
+                for mentIdx,ment in enumerate(self.mentions[sesStart:sesEnd]):
+                    if ment not in self.tweetIdBag[timeslot]:
+                        self.tweetIdBag[timeslot][ment]=[]
+                    elif tmptweetids[mentIdx]:
+                        self.tweetIdBag[timeslot][ment].append(tmptweetids[mentIdx])
+
+                #create dictionary of text per user
+                tmptweetText=self.twText[sesStart:sesEnd]
+                self.tweetTextBag[timeslot]={}
+                for authIdx,auth in enumerate(self.authors[sesStart:sesEnd]):
+                    if auth not in self.tweetTextBag[timeslot]:
+                        self.tweetTextBag[timeslot][auth]=[]
+                    elif tmptweetText[authIdx]:
+                        self.tweetTextBag[timeslot][auth].append(tmptweetText[authIdx])
+                for mentIdx,ment in enumerate(self.mentions[sesStart:sesEnd]):
+                    if ment not in self.tweetTextBag[timeslot]:
+                        self.tweetTextBag[timeslot][ment]=[]
+                    elif tmptweetText[mentIdx]:
+                        self.tweetTextBag[timeslot][ment].append(tmptweetText[mentIdx])
+
+                #Create dictionary of text
+
 
                 #Construct networkX graph
                 tempDiGraph=nx.DiGraph()
@@ -218,6 +293,8 @@ class communityranking:
                 sesStart=sesEnd
                 timeslot+=1
 
+        self.timeLimit=[time.ctime(int(x)) for x in timeLimit]
+
     def timeslotselection(self,authors,mentions,alltime):
         ###Parsing commences###
 
@@ -242,7 +319,7 @@ class communityranking:
         fig = plt.figure(figsize=(10,8))
         plotcount,globfirstderiv,globmentionLimit=0,{},{}
         for seg in self.timeSeg:
-            curTime,bin,freqStat,mentionLimit=0,0,[0],[]
+            curTime,bin,freqStat,mentionLimit,timeLabels=0,0,[0],[],[]
             for i in range(lT):
                 curTime+=timeDif[i]
                 if curTime<=seg:
@@ -250,10 +327,11 @@ class communityranking:
                 else:
                     curTime=0
                     mentionLimit=np.append(mentionLimit,i)
+                    timeLabels=np.append(timeLabels,datetime.datetime.fromtimestamp(alltime[i]).strftime('%d/%m'))
                     bin+=1
                     freqStat=np.append(freqStat,0)
             mentionLimit=np.append(mentionLimit,i)
-
+            timeLabels=np.append(timeLabels,datetime.datetime.fromtimestamp(alltime[i]).strftime('%d/%m'))
             freqStatIni=np.zeros(len(freqStat)+1)
             freqStatMoved=np.zeros(len(freqStat)+1)
             freqStatIni[0:len(freqStat)]=freqStat
@@ -268,34 +346,56 @@ class communityranking:
             if seg/3600<1:
                 timeNum=seg/60
                 timeTitle=" mins"
-            elif seg/86400>1:
+                pertick=7
+            elif seg/86400>=1:
                 timeNum=seg/86400
                 timeTitle=" days"
+                pertick=7
+            elif seg/604800>=1:
+                timeNum=seg/604800
+                timeTitle=" weeks"
+                pertick=7
             else:
                 timeNum=seg/3600
                 timeTitle=" hours"
-            plt.subplot(int(np.ceil(len(self.timeSeg)/2)),2,plotcount,autoscale_on=True)
+                pertick=7
+            ax=fig.add_subplot(2,int(np.ceil(len(self.timeSeg)/2)),plotcount,autoscale_on=True)
             plt.grid(axis='x')
             plt.plot(freqStat,'b-',hold=True)
             plt.ylabel("User activity (mentions)")
-            plt.xlabel("time(sampling period:"+str(timeNum)+timeTitle+")")
+            plt.xlabel("Initiation time: "+time.ctime(int(self.alltime[0])) +" (sampling period:"+str(timeNum)+timeTitle+")")
             POI=[]
             for k in range(len(mentionLimit)):
                 if firstderiv[k]<0 and firstderiv[k+1]>=0:
                     POI=np.append(POI,k)
             POI=np.int32(POI)
             plt.plot(POI,freqStat[POI],'ro',hold=True)
+            ax.set_xticks(np.arange(POI[0],POI[-1],pertick))#, minor=False)
+            ax.set_xticklabels(timeLabels[0:-1:pertick], minor=False,fontsize=6)
+            plt.xlim(xmax=(len(freqStat)))
         interactive(True)
         fig.tight_layout()
+        mng = plt.get_current_fig_manager()
+        mng.resize(*mng.window.maxsize())
         fig.show()
-        plt.savefig(self.dataset_path+"/data/results/user_activity.pdf",bbox_inches='tight',format='pdf')
+        plt.savefig(self.dataset_path+"/data/GDD/results/user_activity_mentions.pdf",bbox_inches='tight',format='pdf')
         timeSegInput=int(input("Insert Selected Sampling Time Please: \n" +str(self.timeSeg)))
         plt.close()
+        if timeSegInput/3600<1:
+                timeNum=timeSegInput/60
+                timeTitle="per_"+str(int(timeNum))+"_mins"
+        elif timeSegInput/86400>1:
+                timeNum=timeSegInput/86400
+                timeTitle="per_"+str(int(timeNum))+"_days"
+        else:
+                timeNum=timeSegInput/3600
+                timeTitle="per_"+str(int(timeNum))+"_hours"
+        self.fileTitle=timeTitle
         firstderiv=globfirstderiv[timeSegInput]
         mentionLimit=globmentionLimit[timeSegInput]
         return firstderiv,mentionLimit
 
-    def evol_detect(self,numTopComms):
+    def evol_detect(self,numTopComms,prevTimeslots):
         self.extraction()
         """Construct Community Dictionary"""
         commNumBag2={}
@@ -318,8 +418,9 @@ class communityranking:
         #Detect any evolution and name the evolving communities
         #uniCommIdsEvol is structured as such {'Id':[rowAppearence],[commCentrality],[commSize],[users]}
         tempUniCommIds,evolcounter,uniCommIdsEvol=[],0,{}
+        print('Community similarity search for each timeslot: ')
         for rows in range(1,timeslots):
-            print('Community similarity search for timeslot: '+str(rows))
+            # print('Community similarity search for timeslot: '+str(rows))
 ##            commIds[rows]=[]
             commIds.append([])
             for clmns in range(lC[rows]):
@@ -340,7 +441,7 @@ class communityranking:
                     thres=.1
                 else:
                     thres=.05
-                for invrow in range(1,4):
+                for invrow in range(1,prevTimeslots+1):
                     prevrow=rows-invrow
                     tmpsim=[]
                     if prevrow>=0:
@@ -390,23 +491,11 @@ class communityranking:
             tempcommRanking[Id].append((sum(np.diff(list(set(uniCommIdsEvol[Id][0])))==1)+1)/(timeslots+1))#stability
             tempcommRanking[Id].append(sum(uniCommIdsEvol[Id][1])/timeSlLen)#commCentrality
             commRanking[Id]=np.prod(tempcommRanking[Id])
-        #calculate maxs for everything and normalize all timestep features
-##        maxP=max((p for k,(p,s,c) in tempcommRanking.items()))
-##        maxS=max((s for k,(p,s,c) in tempcommRanking.items()))
-##        maxC=max((c for k,(p,s,c) in tempcommRanking.items()))
-##        commRanking={}
-##        tempcommRankingNorms={}
-##        for Id in uniCommIds:
-##            tempcommRankingNorms[Id]=[]
-##            tempcommRankingNorms[Id].append(tempcommRanking[Id][0]/maxP)#normalized persistence
-##            tempcommRankingNorms[Id].append(tempcommRanking[Id][1]/maxS)#normalized stability
-##            tempcommRankingNorms[Id].append(tempcommRanking[Id][2]/maxC)#normalized commCentrality
-##            commRanking[Id]=np.prod(tempcommRankingNorms[Id])
 
         rankedCommunities= sorted(commRanking, key=commRanking.get,reverse=True)
 
         row_labels = list(range(timeslots))
-        column_labels= rankedCommunities[0:100]
+        column_labels= list(range(100))
         commSizeHeatData=np.zeros([len(rankedCommunities),timeslots])
         for rCIdx,comms in enumerate(rankedCommunities[0:100]):
             for sizeIdx,timesteps in enumerate(uniCommIdsEvol[comms][0]):
@@ -426,36 +515,58 @@ class communityranking:
         ax.xaxis.tick_top()
         ax.set_xticklabels(row_labels, minor=False)
         ax.set_yticklabels(column_labels, minor=False,fontsize=7)
+        ax2 = ax.twinx()
+        ax2.set_yticks(np.arange(commSizeHeatData.shape[0]), minor=False)
+        ax2.set_yticklabels(column_labels, minor=False,fontsize=7)
+        ax2.invert_yaxis()
+        plt.grid(axis='y')
         plt.tight_layout()
         interactive(False)
         plt.show()
-        fig.savefig(self.dataset_path+"/data/results/communitySizeHeatmap.pdf",bbox_inches='tight',format='pdf')
+        fig.savefig(self.dataset_path+"/data/GDD/results/communitySizeHeatmap_"+self.fileTitle+".pdf",bbox_inches='tight',format='pdf')
         plt.close()
 
         '''Writing ranked communities to json files'''
         rankedCommunitiesFinal={}
-        twitterDataFile = open(self.dataset_path+'/data/results/rankedCommunities.json', "w")
+        twitterDataFile = open(self.dataset_path+'/data/GDD/results/rankedCommunities.json', "w")
         jsondata=dict()
         jsondata["ranked_communities"]=[]
         for rank,rcomms in enumerate(rankedCommunities[:numTopComms]):
-            tmslUsrs,tmpTags=[],[]
+            tmslUsrs,tmpTags,tmptweetids,commTwText,tmpUrls=[],[],[],[],[]
             strRank='{0}'.format(str(rank).zfill(2))
             rankedCommunitiesFinal[strRank]=[rcomms]
             rankedCommunitiesFinal[strRank].append(commRanking[rcomms])
             rankedCommunitiesFinal[strRank].append(uniCommIdsEvol[rcomms][3])
+            timeSlotApp=[self.timeLimit[x] for x in uniCommIdsEvol[rcomms][0]]
             for tmsl,users in enumerate(uniCommIdsEvol[rcomms][3]):
-                uscentr=[]
+                uscentr,tmptweetText=[],[]
                 for us in users:
                     uscentr.append([us,self.userPgRnkBag[uniCommIdsEvol[rcomms][0][tmsl]][us]])
-                    uscentr = sorted(uscentr, key=itemgetter(1), reverse=True)
+                    # uscentr = sorted(uscentr, key=itemgetter(1), reverse=True)
                     if us in self.tagBag[uniCommIdsEvol[rcomms][0][tmsl]]:
                         tmpTags.extend(self.tagBag[uniCommIdsEvol[rcomms][0][tmsl]][us])
+                    if us in self.urlBag[uniCommIdsEvol[rcomms][0][tmsl]]:
+                        tmpUrls.extend(self.urlBag[uniCommIdsEvol[rcomms][0][tmsl]][us])
+                    if us in self.tweetIdBag[uniCommIdsEvol[rcomms][0][tmsl]]:
+                        tmptweetids.extend(self.tweetIdBag[uniCommIdsEvol[rcomms][0][tmsl]][us])
+                    if us in self.tweetTextBag[uniCommIdsEvol[rcomms][0][tmsl]]:
+                        tmptweetText.extend(self.tweetTextBag[uniCommIdsEvol[rcomms][0][tmsl]][us])
+                uscentr = sorted(uscentr, key=itemgetter(1), reverse=True)
                 tmslUsrs.append({uniCommIdsEvol[rcomms][0][tmsl]:uscentr})
+                tmptweetText=[i.replace("\n","") for i in tmptweetText]
+                seen = set()
+                seen_add = seen.add
+                tmptweetText2= [x for x in tmptweetText if x not in seen and not seen_add(x)]
+                commTwText.append({timeSlotApp[tmsl]:tmptweetText2})
             popTags=[x.lower() for x in list(itertools.chain.from_iterable(tmpTags))]
             popTags=collections.Counter(popTags)
             popTags=popTags.most_common(10)
-            jsondata["ranked_communities"].append({'community label':rcomms,'rank':rank+1,'timeslot appearance':uniCommIdsEvol[rcomms][0],'persistence:':tempcommRanking[rcomms][0],
-            'stability':tempcommRanking[rcomms][1],'community centrality':tempcommRanking[rcomms][2],'community size per slot':uniCommIdsEvol[rcomms][2],'users:centrality per timeslot':tmslUsrs,'popTags':popTags})
-        twitterDataFile.write(json.dumps(jsondata, sort_keys=True))
+            popUrls=[x.lower() for x in list(itertools.chain.from_iterable(tmpUrls))]
+            popUrls=collections.Counter(popUrls)
+            popUrls=popUrls.most_common(10)
+            commTweetIds=list(set(tmptweetids))
+            jsondata["ranked_communities"].append({'community label':rcomms,'rank':rank+1,'timeslot appearance':timeSlotApp,'text':commTwText,'persistence:':tempcommRanking[rcomms][0],
+            'stability':tempcommRanking[rcomms][1],'community centrality':tempcommRanking[rcomms][2],'community size per slot':uniCommIdsEvol[rcomms][2],'users:centrality per timeslot':tmslUsrs,'popTags':popTags,'popUrls':popUrls})
+        twitterDataFile.write(json.dumps(jsondata, sort_keys=True))#,ensure_ascii=False).replace("\u200f",""))
         twitterDataFile.close()
         return rankedCommunitiesFinal
