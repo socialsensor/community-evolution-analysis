@@ -28,7 +28,7 @@ numTopComms=100
 #User sets how many timeslots back the framework should search
 prevTimeslots=7
 #User decides whether to simplify the jsons into readable txts:  1-on / 0-off (time consuming)
-simplify_json=0
+simplify_json=1
 
 '''Functions'''
 t = time.time()

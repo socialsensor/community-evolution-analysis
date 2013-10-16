@@ -81,7 +81,7 @@ class communityranking:
                             else:
                                 tweetUrls.append([])
                         if simplify_json==1:
-                            my_text=json_line["text"].replace("\n","").replace('\u200F',"").replace('\u2033',"").replace('\u20aa',"").replace('\x92',"").replace('\u200b',"").replace('\u200e',"").replace('\u203c',"")
+                            my_text=json_line["text"].replace("\n","").replace('\u200F',"").replace('\u2033',"").replace('\u20aa',"").replace('\x92',"").replace('\u200b',"").replace('\u200e',"").replace('\u203c',"").replace('\u2002',"")
 ##                            print(my_text)
                             my_txt.write(json_line["user"]["screen_name"]+"\t" + ",".join(tmpMents)+"\t"+"\""+json_line["created_at"]+"\""+"\t"+str(my_text)+"\n")
                     else:
@@ -161,7 +161,7 @@ class communityranking:
         firstderiv,mentionLimit=self.timeslotselection(self.authors,self.mentions,self.alltime)
 
         #Split time according to the first derivative of the users' activity#
-        sesStart,timeslot,timeLimit=0,0,[]
+        sesStart,timeslot,timeLimit=0,0,[self.alltime[0]]
         print("Forming timeslots")
         for k in range(len(mentionLimit)):
             if firstderiv[k]<0 and firstderiv[k+1]>=0:
@@ -292,7 +292,8 @@ class communityranking:
                 self.commNumBag[timeslot]=numComms
                 sesStart=sesEnd
                 timeslot+=1
-
+        day_month=[datetime.datetime.fromtimestamp(int(x)).strftime('%d/%m') for x in timeLimit]
+        self.day_month=day_month
         self.timeLimit=[time.ctime(int(x)) for x in timeLimit]
 
     def timeslotselection(self,authors,mentions,alltime):
@@ -331,7 +332,7 @@ class communityranking:
                     bin+=1
                     freqStat=np.append(freqStat,0)
             mentionLimit=np.append(mentionLimit,i)
-            timeLabels=np.append(timeLabels,datetime.datetime.fromtimestamp(alltime[i]).strftime('%d/%m'))
+            timeLabels=np.append(timeLabels,datetime.datetime.fromtimestamp(alltime[-1]).strftime('%d/%m'))
             freqStatIni=np.zeros(len(freqStat)+1)
             freqStatMoved=np.zeros(len(freqStat)+1)
             freqStatIni[0:len(freqStat)]=freqStat
@@ -358,7 +359,7 @@ class communityranking:
             else:
                 timeNum=seg/3600
                 timeTitle=" hours"
-                pertick=7
+            pertick=3
             ax=fig.add_subplot(2,int(np.ceil(len(self.timeSeg)/2)),plotcount,autoscale_on=True)
             plt.grid(axis='x')
             plt.plot(freqStat,'b-',hold=True)
@@ -370,7 +371,7 @@ class communityranking:
                     POI=np.append(POI,k)
             POI=np.int32(POI)
             plt.plot(POI,freqStat[POI],'ro',hold=True)
-            ax.set_xticks(np.arange(POI[0],POI[-1],pertick))#, minor=False)
+            ax.set_xticks(np.arange(0,len(freqStat),pertick))#, minor=False)
             ax.set_xticklabels(timeLabels[0:-1:pertick], minor=False,fontsize=6)
             plt.xlim(xmax=(len(freqStat)))
         interactive(True)
@@ -480,7 +481,7 @@ class communityranking:
         uniCommIds.sort()
         # return (jaccdict,maxCommSimPercentage,lC)
         print(str(birthcounter)+" births, "+str(evolcounter)+" evolutions and "+str(len(uniCommIds))+" dynamic communities")
-
+        self.commsEvolve=uniCommIdsEvol
         tempcommRanking={}
         #structure: tempcommRanking={Id:[persistence,stability,commCentrality]}
         commRanking={}
@@ -493,8 +494,7 @@ class communityranking:
             commRanking[Id]=np.prod(tempcommRanking[Id])
 
         rankedCommunities= sorted(commRanking, key=commRanking.get,reverse=True)
-
-        row_labels = list(range(timeslots))
+        row_labels = self.day_month#(range(timeslots))
         column_labels= list(range(100))
         commSizeHeatData=np.zeros([len(rankedCommunities),timeslots])
         for rCIdx,comms in enumerate(rankedCommunities[0:100]):
