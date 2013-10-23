@@ -23,13 +23,13 @@ class communityranking:
     @classmethod
     def from_json(cls,dataset_path,timeSeg,simplify_json):
         '''Make temp folder if non existant'''
-        if not os.path.exists(dataset_path+"/data/GDD/results/forGephi"):
-            os.makedirs(dataset_path+"/data/GDD/results/forGephi")
-        if not os.path.exists(dataset_path+"/data/GDD/results/simplified_json"):
-            os.makedirs(dataset_path+"/data/GDD/results/simplified_json")
+        if not os.path.exists(dataset_path+"/data/results/forGephi"):
+            os.makedirs(dataset_path+"/data/results/forGephi")
+        if not os.path.exists(dataset_path+"/data/results/simplified_json"):
+            os.makedirs(dataset_path+"/data/results/simplified_json")
 
         #Get filenames from json dataset path
-        files = glob.glob(dataset_path+"/data/GDD/json/*.json")
+        files = glob.glob(dataset_path+"/data/json/*.json")
         files.sort(key=os.path.getmtime)
 
         '''Parse the json files into authors/mentions/alltime/tags/tweetIds/text lists'''
@@ -37,7 +37,7 @@ class communityranking:
         counter,totTweets,totMentTws,totNonMentTws,totMents,hashes,urlCount=0,0,0,0,0,0,0
         for filename in files:
             if simplify_json==1:
-                my_txt=open(dataset_path+"/data/GDD/results/simplified_json/auth_ment_time_text_"+str(counter)+".txt","w")#file containing author mentioned time text
+                my_txt=open(dataset_path+"/data/results/simplified_json/auth_ment_time_text_"+str(counter)+".txt","w")#file containing author mentioned time text
                 counter+=1
             # print(filename)
             my_file=open(filename,"r")
@@ -81,7 +81,7 @@ class communityranking:
                             else:
                                 tweetUrls.append([])
                         if simplify_json==1:
-                            my_text=json_line["text"].replace("\n","").replace('\u200F',"").replace('\u2033',"").replace('\u20aa',"").replace('\x92',"").replace('\u200b',"").replace('\u200e',"").replace('\u203c',"").replace('\u2002',"")
+                            my_text=json_line["text"].replace("\n","").replace('\u200F',"").replace('\u2033',"").replace('\u20aa',"").replace('\x92',"").replace('\u200b',"").replace('\u200e',"").replace('\u203c',"").replace('\u2002',"").replace('\u2009',"")
 ##                            print(my_text)
                             my_txt.write(json_line["user"]["screen_name"]+"\t" + ",".join(tmpMents)+"\t"+"\""+json_line["created_at"]+"\""+"\t"+str(my_text)+"\n")
                     else:
@@ -103,11 +103,11 @@ class communityranking:
     @classmethod
     def from_txt(cls,dataset_path,timeSeg):
         '''Make temp folder if non existant'''
-        if not os.path.exists(dataset_path+"/data/GDD/results/forGephi"):
-            os.makedirs(dataset_path+"/data/GDD/results/forGephi")
+        if not os.path.exists(dataset_path+"/data/results/forGephi"):
+            os.makedirs(dataset_path+"/data/results/forGephi")
 
         #Get filenames from txt dataset path
-        files = glob.glob(dataset_path+"/data/GDD/txt/*.txt")
+        files = glob.glob(dataset_path+"/data/txt/*.txt")
         files.sort(key=os.path.getmtime)
 
         '''Parse the txt files into authors/mentions/alltime lists'''
@@ -145,14 +145,12 @@ class communityranking:
         self.uniqueUsers={}
         self.userPgRnkBag={}
         self.commPgRnkBag={}
-        self.commPgRnkBag={}
         self.commStrBag={}
         self.commNumBag={}
         self.tagBag={}
         self.tweetIdBag={}
         self.tweetTextBag={}
         self.urlBag={}
-        self.rankedCommunities={}
 
     def extraction(self):
         '''Extract adjacency lists,mats,user and community centrality and communities bags'''
@@ -182,7 +180,7 @@ class communityranking:
                 adjList=list(zip(adjauthors,adjments,weights))
 
                 #Write pairs of users to txt file for Gephi
-                my_txt=open(self.dataset_path+"/data/GDD/results/forGephi/usersPairs_"+fileNum+".txt","w")
+                my_txt=open(self.dataset_path+"/data/results/forGephi/usersPairs_"+fileNum+".txt","w")
                 my_txt.write("Source,Target,Weight"+"\n")
                 for line in adjList:
                     my_txt.write(",".join(str(x) for x in line) + "\n")
@@ -234,9 +232,6 @@ class communityranking:
                     elif tmptweetText[mentIdx]:
                         self.tweetTextBag[timeslot][ment].append(tmptweetText[mentIdx])
 
-                #Create dictionary of text
-
-
                 #Construct networkX graph
                 tempDiGraph=nx.DiGraph()
                 tempDiGraph.add_weighted_edges_from(adjList)
@@ -247,9 +242,9 @@ class communityranking:
 
                 #Extract the centrality of each user using the PageRank algorithm
                 tempUserPgRnk=nx.pagerank(tempDiGraph,alpha=0.85,max_iter=100,tol=0.001)
-                maxPGR=max((pgr for k,(pgr) in tempUserPgRnk.items()))
-                for k in tempUserPgRnk.items():
-                    tempUserPgRnk[k[0]]/=maxPGR
+##                maxPGR=max((pgr for k,(pgr) in tempUserPgRnk.items()))
+##                for k in tempUserPgRnk.items():
+##                    tempUserPgRnk[k[0]]/=maxPGR
                 self.userPgRnkBag[timeslot]=tempUserPgRnk
 
                 #Detect Communities using the louvain algorithm#
@@ -284,7 +279,7 @@ class communityranking:
                 maxCPGR=max((cpgr for k,(cpgr) in commPgRnk.items()))
                 commPgRnkList=[]
                 for key,value in commPgRnk.items():
-                    commPgRnkList.append(value/maxCPGR)
+                    commPgRnkList.append(value)#/maxCPGR)
                 self.commPgRnkBag[timeslot]=commPgRnkList
 
                 '''Construct Community Dictionary'''
@@ -317,7 +312,7 @@ class communityranking:
         ###Extract the first derivative###
         font = {'size'   : 9}
         plt.rc('font', **font)
-        fig = plt.figure(figsize=(10,8))
+        fig = plt.figure()#figsize=(10,8)
         plotcount,globfirstderiv,globmentionLimit=0,{},{}
         for seg in self.timeSeg:
             curTime,bin,freqStat,mentionLimit,timeLabels=0,0,[0],[],[]
@@ -360,7 +355,10 @@ class communityranking:
                 timeNum=seg/3600
                 timeTitle=" hours"
             pertick=3
-            ax=fig.add_subplot(2,int(np.ceil(len(self.timeSeg)/2)),plotcount,autoscale_on=True)
+            if len(self.timeSeg)<3:
+                ax=fig.add_subplot(2,int(np.ceil(len(self.timeSeg)/2)),plotcount,autoscale_on=True)
+            else:
+                ax=fig.add_subplot(int(np.ceil(len(self.timeSeg)/2),2),plotcount,autoscale_on=True)            
             plt.grid(axis='x')
             plt.plot(freqStat,'b-',hold=True)
             plt.ylabel("User activity (mentions)")
@@ -379,7 +377,7 @@ class communityranking:
         mng = plt.get_current_fig_manager()
         mng.resize(*mng.window.maxsize())
         fig.show()
-        plt.savefig(self.dataset_path+"/data/GDD/results/user_activity_mentions.pdf",bbox_inches='tight',format='pdf')
+        plt.savefig(self.dataset_path+"/data/results/user_activity_mentions.pdf",bbox_inches='tight',format='pdf')
         timeSegInput=int(input("Insert Selected Sampling Time Please: \n" +str(self.timeSeg)))
         plt.close()
         if timeSegInput/3600<1:
@@ -469,7 +467,7 @@ class communityranking:
                                 uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[prevrow][maxIdx])#community size per timeslot for first evolution
                                 uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[prevrow][maxIdx])#users in each community for first evolution
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][0].append(rows)#timeslot num
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[rows][clmns])#community pagerank
+                            uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[rows][clmns])#community pagerank per timeslot
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[rows][clmns])#community size per timeslot
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[rows][clmns])#users in each community
                             commIds[rows].append(commIds[prevrow][maxIdx])
@@ -495,9 +493,10 @@ class communityranking:
 
         rankedCommunities= sorted(commRanking, key=commRanking.get,reverse=True)
         row_labels = self.day_month#(range(timeslots))
-        column_labels= list(range(100))
+        column_labels= list(range(numTopComms))
+        column_labels2= rankedCommunities[0:numTopComms]
         commSizeHeatData=np.zeros([len(rankedCommunities),timeslots])
-        for rCIdx,comms in enumerate(rankedCommunities[0:100]):
+        for rCIdx,comms in enumerate(rankedCommunities[0:numTopComms]):
             for sizeIdx,timesteps in enumerate(uniCommIdsEvol[comms][0]):
                 if commSizeHeatData[rCIdx,timesteps]!=0:
                     commSizeHeatData[rCIdx,timesteps]=max(np.log(uniCommIdsEvol[comms][2][sizeIdx]),commSizeHeatData[rCIdx,timesteps])
@@ -508,8 +507,8 @@ class communityranking:
         ax.set_xticks(np.arange(commSizeHeatData.shape[1]), minor=False)
         ax.set_yticks(np.arange(commSizeHeatData.shape[0]), minor=False)
         plt.xlim(xmax=(timeslots))
-        plt.ylim(ymax=(len(rankedCommunities[0:100])))
-        plt.ylabel("Ranked Communities (Best 100)")
+        plt.ylim(ymax=(len(rankedCommunities[0:numTopComms])))
+        plt.ylabel("Ranked Communities (Best "+str(numTopComms)+")")
         plt.xlabel('Timeslot',{'verticalalignment':'top'})
         ax.invert_yaxis()
         ax.xaxis.tick_top()
@@ -517,18 +516,19 @@ class communityranking:
         ax.set_yticklabels(column_labels, minor=False,fontsize=7)
         ax2 = ax.twinx()
         ax2.set_yticks(np.arange(commSizeHeatData.shape[0]), minor=False)
-        ax2.set_yticklabels(column_labels, minor=False,fontsize=7)
+        ax2.set_yticklabels(column_labels2, minor=False,fontsize=7)
         ax2.invert_yaxis()
-        plt.grid(axis='y')
+        if numTopComms<101:
+            plt.grid(axis='y')
         plt.tight_layout()
         interactive(False)
         plt.show()
-        fig.savefig(self.dataset_path+"/data/GDD/results/communitySizeHeatmap_"+self.fileTitle+".pdf",bbox_inches='tight',format='pdf')
+        fig.savefig(self.dataset_path+"/data/results/communitySizeHeatmap_"+self.fileTitle+".pdf",bbox_inches='tight',format='pdf')
         plt.close()
 
         '''Writing ranked communities to json files'''
         rankedCommunitiesFinal={}
-        twitterDataFile = open(self.dataset_path+'/data/GDD/results/rankedCommunities.json', "w")
+        twitterDataFile = open(self.dataset_path+'/data/results/rankedCommunities.json', "w")
         jsondata=dict()
         jsondata["ranked_communities"]=[]
         for rank,rcomms in enumerate(rankedCommunities[:numTopComms]):
