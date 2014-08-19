@@ -604,11 +604,10 @@ class communityranking:
         return self
 
     def commRanking(self,numTopComms, prevTimeslots,xLablNum):
-        import itertools, tfidf #,text
+        import itertools, tfidf 
         # from pymongo import MongoClient
         from pytagcloud.lang.stopwords import StopWords
         # from nltk.corpus import stopwords
-        # from text.blob import TextBlob as tb
         from wordcloud import  make_wordcloud
         from PIL import Image
 
@@ -817,7 +816,6 @@ class communityranking:
 
     def corpusExtraction(self,rankedCommunities):
         # from nltk.corpus import stopwords
-        # from text.blob import TextBlob as tb
         from pytagcloud.lang.stopwords import StopWords
         from math import log
 
@@ -832,7 +830,6 @@ class communityranking:
         # cntr=0
         regex1 = re.compile("(?:\@|#|https?\://)\S+",re.UNICODE)
         regex2 = re.compile("\w+'?\w",re.UNICODE)
-        # regex2 = re.compile('([^\s\w]|_)+',re.UNICODE)
         fullText = [i.replace("\n", " ").replace('\t',' ') for i in self.twText]
         seen = set()
         seen_add = seen.add

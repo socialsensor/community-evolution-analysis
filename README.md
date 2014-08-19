@@ -2,9 +2,9 @@ community-evolution-analysis
 ============================
 
 ###A framework for the analysis of social interaction networks (e.g. induced by Twitter mentions) in time.
-We make available a Twitter interaction network collector and a set of Matlab and Python scripts that enable the analysis of social interaction networks with the goal of uncovering evolving communities. More specifically, the interaction network collector forms a network between Twitter users based on the mentions in the set of monitored tweets (using the Streaming API). The network of interactions is adaptively partitioned into snapshot graphs based on the frequency of interactions. Then, each graph snapshot is partitioned into communities using the Louvain method [2]. Dynamic communities are extracted by matching the communities of the current graph snapshot to communities of previous snapshot. Finally, these dynamic communities are ranked and presented to the user in accordance to three factors; stability, persistence and community centrality. The user can browse through these communities in which the users are also ranked in accordance to their own specific snapshot centrality. The PageRank algorithm [3] is used to measure the feature of centrality.
+We make available a Twitter interaction network collector and a set of Matlab and Python scripts that enable the analysis of social interaction networks with the goal of uncovering evolving communities. More specifically, the interaction network collector forms a network between Twitter users based on the mentions in the set of monitored tweets (using the Streaming API). The network of interactions is adaptively partitioned into snapshot graphs based on the frequency of interactions. Then, each graph snapshot is partitioned into communities using the Louvain method [2]. Dynamic communities are extracted by matching the communities of the current graph snapshot to communities of previous snapshot. Finally, these dynamic communities are ranked and presented to the user in accordance to three factors; stability, persistence and community centrality. The user can browse through these communities in which the users are also ranked in accordance to their own specific snapshot centrality, browse through wordclouds containing a summary of the most frequently used terms in each dynamic community and the most frequent urls. The PageRank algorithm [3] is used to measure the feature of centrality.
 
-* The master branch of this repository contains ongoing matlab and python files which form the current stable version of the framework. 
+* The master branch of this repository contains matlab and python files which form the current stable version of the framework, although the matlab version has been dropped since the end of 2013 and lacks certain features that the python version includes. 
 * The _"pci13"_ branch contains all the code and data needed to replicate the experiments performed in [1].
 * The _"dev"_ branch contains more advanced but unstable versions of the framework.
 
@@ -21,22 +21,32 @@ This distribution contains the following:
 ##Evolution analysis using Python##
 
 Any new data (json files) to be analysed should be placed in the _../data/json/_ folder.
-In order for the python files to work, the data should be in a json twitter-like form  (the "entities", "user" and "created\_at" keys and paths should be identical with twitter's).
+In order for the python files to work, the data should be in a json twitter-like form  (the "entities", "user", "created\_at", "id_str" and "text" keys and paths should be identical with twitter's).
 
 ###Code###
-The python code consists of 3 files containing friendly user scripts for performing Community Evolution Analysis from json and txt files acquired from the Twitter social network.
-The framework was implemented using Python 3.3 and the 3rd party libraries required for the framework to work are _dateutil_ (requires _pyparsing_), _numpy_, _matplotlib_ and _networkx_ (http://www.lfd.uci.edu/~gohlke/pythonlibs/). 
+The python code consists of 8 files containing friendly user scripts for performing Community Evolution Analysis from json and txt files acquired from the Twitter social network.
+The framework was implemented using Python 3.3 and the 3rd party libraries required for the framework to work are _dateutil_ (requires _pyparsing_), _numpy_, _matplotlib_, _PIL_ and _networkx_ (http://www.lfd.uci.edu/~gohlke/pythonlibs/). 
 
-The python folder contains 3 files:
+The python folder contains 8 files:
 * <code>main.py</code>  
-    This .py file is used to provide a guideline to the user as to how to use the framework (CommunityRanking.py file).
+    This .py is the main framework file needed to run the CommunityRanking.py class file. It includes all the tweakable parameters. Timeslots are adaptively created. 
+* <code>CommunityRanking.py</code>  
+    This .py is the class file that contains the Evolution Analysis Framework.
+* <code>main_NONadaptive.py</code>  
+    This .py is the main framework file needed to run the CommunityRanking_NONadaptive.py class file. It includes all the tweakable parameters. Timeslots are straightforwardly created. 
+* <code>CommunityRanking.py</code>  
+    This .py is the class file that contains the Evolution Analysis Framework.
 * <code>community.py</code>  
     This is a copy of Aynaud's implementation of the Louvain community detection algorithm.
-* <code>CommunityRanking.py</code>  
-    This .py file contains the Evolution Analysis Framework.
+* <code>tfidf.py</code>  
+    This .py file computes the tfidf score of the words contained in each dynamic community.
+* <code>wordcloud.py</code>  
+    This is an edited copy of A.C. Mueller's wordcloud creation script.
+* <code>query_integral_image.pyd</code>  
+    Dependency of the wordcloud.py script.
 
 ###Python Results###
-The framework provides the user with 5 pieces of resulting data in the _../data/results/_ folder: a) the user_activity.eps file which presents the user mentioning activity according to the selected sampling interval, b) usersPairs_(num).txt files which can be used with the Gephi visualization software in order to view the praphs, c) the rankedcommunities variable (from main.py) which contains all the communities (and their users) which evolved ranked in accordance to the persistence, stability and community centrality triplet, d) the community size heatmap (communitySizeHeatmap.eps) which provides a visualization of the sizes of the 100 most important communities (ranked from top to bottom) and e) the rankedCommunities.json file which contains all the ranked communities along with all the information regarding the specific timeslot of evolution for each community, the persistence, stability and community centrality values and all the users in each community accompanied by their own centrality measure. As such, the framework can be used to discover the most important communities along with the most important users inside those communities.
+The framework provides the user with 5 pieces of resulting data in the _../data/results/_ folder: a) the user_activity.eps file which presents the user mentioning activity according to the selected sampling interval, b) usersPairs_(num).txt files which can be used with the Gephi visualization software in order to view the praphs, c) the rankedcommunities variable (from main.py) which contains all the communities (and their users) which evolved ranked in accordance to the persistence, stability and community centrality triplet, d) the community size heatmap (communitySizeHeatmap.eps) which provides a visualization of the sizes of the first 100 most important communities (ranked from top to bottom), a set of wordclouds (in the _../results/wordclouds_ folder) collaged in a manner similar to the heatmap (separate wordclouds for every ranked dynamic community are also created in the same folder) and e) the rankedCommunities.json file which contains all the ranked communities along with all the information regarding the specific timeslot of evolution for each community, the persistence, stability and community centrality values and all the users in each community accompanied by their own centrality measure. As such, the framework can be used to discover the most important communities along with the most important users inside those communities, follow the most referenced URLs but also acquire an idea about the topics discussed via wordclouds.
 
 ##Evolution analysis using Matlab##
 
