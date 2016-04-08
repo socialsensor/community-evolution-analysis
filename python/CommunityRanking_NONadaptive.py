@@ -536,18 +536,18 @@ class communityranking:
                                 uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[prevrow][maxIdx])#community pagerank for first evolution
                                 uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[prevrow][maxIdx])#community size per timeslot for first evolution
                                 uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[prevrow][maxIdx])#users in each community for first evolution
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][4].append(self.degreeBag[prevrow][maxIdx])#community degree for first evolution
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][5].append(self.commDegreenessBag[prevrow][maxIdx])#community degree centrality for first evolution
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][6].append(self.commBetweenessBag[prevrow][maxIdx])#community betweeness centrality for first evolution
+                                # uniCommIdsEvol[commIds[prevrow][maxIdx]][4].append(self.degreeBag[prevrow][maxIdx])#community degree for first evolution
+                                # uniCommIdsEvol[commIds[prevrow][maxIdx]][5].append(self.commDegreenessBag[prevrow][maxIdx])#community degree centrality for first evolution
+                                # uniCommIdsEvol[commIds[prevrow][maxIdx]][6].append(self.commBetweenessBag[prevrow][maxIdx])#community betweeness centrality for first evolution
 								#uniCommIdsEvol[commIds[prevrow][maxIdx]][7].append(0)
                                 commCntr+=1
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][0].append(rows)#timeslot num
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[rows][clmns])#community pagerank per timeslot
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[rows][clmns])#community size per timeslot
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[rows][clmns])#users in each community
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][4].append(self.degreeBag[rows][clmns])#community degree per timeslot
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][5].append(self.commDegreenessBag[rows][clmns])#community degree centrality per timeslot
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][6].append(self.commBetweenessBag[rows][clmns])#community betweeness centrality per timeslot
+                            # uniCommIdsEvol[commIds[prevrow][maxIdx]][4].append(self.degreeBag[rows][clmns])#community degree per timeslot
+                            # uniCommIdsEvol[commIds[prevrow][maxIdx]][5].append(self.commDegreenessBag[rows][clmns])#community degree centrality per timeslot
+                            # uniCommIdsEvol[commIds[prevrow][maxIdx]][6].append(self.commBetweenessBag[rows][clmns])#community betweeness centrality per timeslot
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][7].append(maxval)#similarity between the two communities in evolving timesteps
                             commIds[rows].append(commIds[prevrow][maxIdx])
                             commCntr+=1
@@ -570,8 +570,6 @@ class communityranking:
 
     def commRanking(self,numTopComms, prevTimeslots,xLablNum):
         import itertools, tfidf 
-        # from pymongo import MongoClient
-        from pytagcloud.lang.stopwords import StopWords
         # from nltk.corpus import stopwords
         from wordcloud import  make_wordcloud
         from PIL import Image
@@ -631,11 +629,6 @@ class communityranking:
         '''Writing ranked communities to json files + MongoDB'''
         dataset_name=self.dataset_path.split('/')
         dataset_name=dataset_name[-1]
-        #Mongo--------------------
-        # client = MongoClient()
-        # db = client[dataset_name]
-        # dyccos=db.dyccos
-        #-------------------------
         rankedCommunitiesFinal = {}
         twitterDataFile = open(self.dataset_path + '/data/nonadaptive/results/rankedCommunities.json', "w")#, encoding="utf-8-sig")
         jsondata = dict()
@@ -700,13 +693,11 @@ class communityranking:
                 topicList = topicList.lower()
                 topicList = regex1.sub('', topicList)
                 topicList = regex2.findall(topicList)
-                s = StopWords()
-                s.load_language(s.guess(topicList))
                 topicList = collections.Counter(topicList)
                 tmpkeys = topicList.keys()
                 if len(topicList)>5:
                     for i in list(tmpkeys):
-                            if not i or i in stop or i.startswith(('htt','(@','t.co')) or len(i)<=2 or s.is_stop_word(i):
+                            if not i or i in stop or i.startswith(('htt','(@','t.co')) or len(i)<=2:
                                 del topicList[i]
                 else:
                     for i in list(tmpkeys):
@@ -774,23 +765,19 @@ class communityranking:
             blank_image.paste(timeimage, (tmptime*width,(position+2)*height))
         imsize=blank_image.size
         blank_image = blank_image.resize((round(imsize[0]/2),round(imsize[1]/2)),Image.ANTIALIAS)
-        blank_image.save(self.dataset_path + "/data/results/wordclouds/"+self.fileTitle+'_collage.pdf', quality=50)
+        blank_image.save(self.dataset_path + "/data/nonadaptive/results/wordclouds/"+self.fileTitle+'_collage.pdf', quality=50)
 
         makefigures(commSizeHeatData,flux,self.fileTitle,self.day_month,commRanking,numTopComms,timeslots,uniCommIdsEvol,rankedCommunities,self.commPerTmslt,self.uniCommIds,prevTimeslots,self.dataset_path,self.xLablNum)
         return rankedCommunitiesFinal
 
     def corpusExtraction(self,rankedCommunities):
         # from nltk.corpus import stopwords
-        # from text.blob import TextBlob as tb
-        from pytagcloud.lang.stopwords import StopWords
         from math import log
 
         print('Extracting dataset corpus')
         uniCommIdsEvol=self.uniCommIdsEvol
 
         # stop = stopwords.words('english')
-        # grstopwords=pickle.load(open("./greek_stopwords.pck", 'rb'))
-        # stop.extend(grstopwords)
         stop = ['gt','amp','rt','via']
         textList=[]
         # cntr=0
@@ -809,7 +796,7 @@ class communityranking:
             # s = StopWords()
             # s.load_language(s.guess(words))
             for i in topicList:
-                if not i or i.startswith(('htt','(@','t.co')) or len(i)<=1 or i in stop:# or s.is_stop_word(i):
+                if not i or i.startswith(('htt','(@','t.co')) or len(i)<=1 or i in stop:
                     continue
                 else:
                     tmpTopicCC.append(i)
@@ -850,7 +837,7 @@ def makefigures(commSizeHeatData,flux,fileTitle,day_month,commRanking,numTopComm
     plt.tight_layout()
     fig1 = plt.gcf()
     plt.draw()
-    fig1.savefig(dataset_path + "/data/results/jaccardianFlux_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
+    fig1.savefig(dataset_path + "/data/nonadaptive/results/jaccardianFlux_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
     plt.close()
     del(fig1)
     print('Finished with flactuation fig')

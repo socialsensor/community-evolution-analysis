@@ -14,7 +14,7 @@ import numpy as np
 from query_integral_image import query_integral_image
 
 # FONT_PATH = "C:/Python33/Lib/site-packages/matplotlib/mpl-data/fonts/ttf/vera.ttf"
-FONT_PATH = "C:/Python33/Lib/site-packages/pytagcloud-0.3.5-py3.3.egg/pytagcloud/fonts/DroidSans.ttf"
+FONT_PATH = "C:/Python35/Lib/site-packages/pytagcloud-0.3.5-py3.3.egg/pytagcloud/fonts/DroidSans.ttf"
 
 
 def make_wordcloud(words, counts, fname=None, font_path=None, width=400, height=200,

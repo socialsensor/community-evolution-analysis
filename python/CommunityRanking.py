@@ -25,10 +25,10 @@ class communityranking:
     @classmethod
     def from_json(cls, dataset_path, timeSeg, simplify_json, rankIrregularTime, timeMin = 0, timeMax = time.time()):
         '''Make temp folder if non existant'''
-        if not os.path.exists(dataset_path + "/data/results/forGephi"):
-            os.makedirs(dataset_path + "/data/results/forGephi")
-        if not os.path.exists(dataset_path + "/data/results/simplified_json"):
-            os.makedirs(dataset_path + "/data/results/simplified_json")
+        if not os.path.exists(dataset_path + "/data/adaptive/results/forGephi"):
+            os.makedirs(dataset_path + "/data/adaptive/results/forGephi")
+        if not os.path.exists(dataset_path + "/data/adaptive/results/simplified_json"):
+            os.makedirs(dataset_path + "/data/adaptive/results/simplified_json")
 
         #Get filenames from json dataset path
         files = glob.glob(dataset_path + "/data/json/*.json")
@@ -39,7 +39,7 @@ class communityranking:
         counter, totTweets, totMentTws, totNonMentTws, totMents, hashes, urlCount = 0, 0, 0, 0, 0, 0, 0
         for filename in files:
             if simplify_json == 1:
-                my_txt = codecs.open(dataset_path + "/data/results/simplified_json/auth_ment_time_text_" + str(counter) + ".txt","w",'utf-8-sig')#file containing author mentioned time text
+                my_txt = codecs.open(dataset_path + "/data/adaptive/results/simplified_json/auth_ment_time_text_" + str(counter) + ".txt","w",'utf-8-sig')#file containing author mentioned time text
                 counter += 1
                 # print(filename)
             # my_file = open(filename, "r")#, encoding="latin-1")
@@ -93,7 +93,7 @@ class communityranking:
             f.close()
             if simplify_json == 1:
                 my_txt.close()
-        statsfile = open(dataset_path + "/data/results/basicstats.txt",'w')
+        statsfile = open(dataset_path + "/data/adaptive/results/basicstats.txt",'w')
         statement = ('Total # of Tweets= ' + str(totTweets) + '\nTotal # of Tweets with mentions: ' +
             str(totMentTws) + '\nTotal # of Tweets without mentions: ' + str(totNonMentTws) +
             '\nTotal # of edges: ' + str(totMents) +
@@ -114,11 +114,11 @@ class communityranking:
     @classmethod
     def from_txt(cls, dataset_path, timeSeg):
         '''Make temp folder if non existant'''
-        if not os.path.exists(dataset_path + "/data/results/forGephi"):
-            os.makedirs(dataset_path + "/data/results/forGephi")
+        if not os.path.exists(dataset_path + "/data/adaptive/results/forGephi"):
+            os.makedirs(dataset_path + "/data/adaptive/results/forGephi")
 
         #Get filenames from txt dataset path
-        files = glob.glob(dataset_path + "/data/txt/*.txt")
+        files = glob.glob(dataset_path + "/data/adaptive/txt/*.txt")
         files.sort(key=os.path.getmtime)
 
         '''Parse the txt files into authors/mentions/alltime lists'''
@@ -194,7 +194,7 @@ class communityranking:
                 adjList = list(zip(adjauthors, adjments, weights))
 
                 #Write pairs of users to txt file for Gephi
-                my_txt = open(self.dataset_path + "/data/results/forGephi/usersPairs_" + fileNum + ".txt", "w")#
+                my_txt = open(self.dataset_path + "/data/adaptive/results/forGephi/usersPairs_" + fileNum + ".txt", "w")#
                 my_txt.write("Source,Target,Weight" + "\n")
                 for line in adjList:
                     my_txt.write(",".join(str(x) for x in line) + "\n")
@@ -325,12 +325,12 @@ class communityranking:
         self.day_month = day_month
         self.timeLimit = [datetime.datetime.fromtimestamp(int(x)).strftime(self.labelstr) for x in timeLimit]
         statement = '\nTotal # of communities is '+str(commCount) + '\n'
-        statsfile = open(self.dataset_path + "/data/results/basicstats.txt",'a')
+        statsfile = open(self.dataset_path + "/data/adaptive/results/basicstats.txt",'a')
         print(statement)
         statsfile.write(statement)
         statsfile.close()
 
-        dataCommPck = open(dataset_path + '/data/tmp/dataComm_'+str(self.fileTitle)+'.pck','wb')
+        dataCommPck = open(self.dataset_path + '/data/adaptive/tmp/dataComm_'+str(self.fileTitle)+'.pck','wb')
         pickle.dump(self, dataCommPck , protocol = 2)
         dataCommPck.close()
 
@@ -376,7 +376,7 @@ class communityranking:
             counter1 += 1
         self.uniqueUsers = uniqueUsers
         statement = "Total # of unique users: "+ str(len(uniqueUsers)) + '\n'
-        statsfile = open(self.dataset_path + "/data/results/basicstats.txt",'a')
+        statsfile = open(self.dataset_path + "/data/adaptive/results/basicstats.txt",'a')
         print(statement)
         statsfile.write(statement)
         statsfile.close()
@@ -465,7 +465,7 @@ class communityranking:
         mng.resize(*mng.window.maxsize())
         interactive(True)
         plt.show()
-        plt.savefig(self.dataset_path + "/data/results/user_activity_mentions.pdf", bbox_inches='tight', format='pdf')
+        plt.savefig(self.dataset_path + "/data/adaptive/results/user_activity_mentions.pdf", bbox_inches='tight', format='pdf')
         timeSegInput = int(input("Please select sampling time: \n" + str(humanTimeSegs)))
         timeSegInput=self.timeSeg[timeSegInput-1]
         plt.close()
@@ -571,18 +571,18 @@ class communityranking:
                                 uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[prevrow][maxIdx])#community pagerank for first evolution
                                 uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[prevrow][maxIdx])#community size per timeslot for first evolution
                                 uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[prevrow][maxIdx])#users in each community for first evolution
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][4].append(self.degreeBag[prevrow][maxIdx])#community degree for first evolution
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][5].append(self.commDegreenessBag[prevrow][maxIdx])#community degree centrality for first evolution
-                                uniCommIdsEvol[commIds[prevrow][maxIdx]][6].append(self.commBetweenessBag[prevrow][maxIdx])#community betweeness centrality for first evolution
+                                # uniCommIdsEvol[commIds[prevrow][maxIdx]][4].append(self.degreeBag[prevrow][maxIdx])#community degree for first evolution
+                                # uniCommIdsEvol[commIds[prevrow][maxIdx]][5].append(self.commDegreenessBag[prevrow][maxIdx])#community degree centrality for first evolution
+                                # uniCommIdsEvol[commIds[prevrow][maxIdx]][6].append(self.commBetweenessBag[prevrow][maxIdx])#community betweeness centrality for first evolution
 								#uniCommIdsEvol[commIds[prevrow][maxIdx]][7].append(0)
                                 commCntr+=1
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][0].append(rows)#timeslot num
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][1].append(self.commPgRnkBag[rows][clmns])#community pagerank per timeslot
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][2].append(commSizeBag[rows][clmns])#community size per timeslot
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][3].append(self.commStrBag[rows][clmns])#users in each community
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][4].append(self.degreeBag[rows][clmns])#community degree per timeslot
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][5].append(self.commDegreenessBag[rows][clmns])#community degree centrality per timeslot
-                            uniCommIdsEvol[commIds[prevrow][maxIdx]][6].append(self.commBetweenessBag[rows][clmns])#community betweeness centrality per timeslot
+                            # uniCommIdsEvol[commIds[prevrow][maxIdx]][4].append(self.degreeBag[rows][clmns])#community degree per timeslot
+                            # uniCommIdsEvol[commIds[prevrow][maxIdx]][5].append(self.commDegreenessBag[rows][clmns])#community degree centrality per timeslot
+                            # uniCommIdsEvol[commIds[prevrow][maxIdx]][6].append(self.commBetweenessBag[rows][clmns])#community betweeness centrality per timeslot
                             uniCommIdsEvol[commIds[prevrow][maxIdx]][7].append(maxval)#similarity between the two communities in evolving timesteps
                             commIds[rows].append(commIds[prevrow][maxIdx])
                             commCntr+=1
@@ -597,7 +597,7 @@ class communityranking:
         del(commIds,self.alltime,self.authors,self.mentions,self.commStrBag,self.commNumBag,self.commBetweenessBag,self.commDegreenessBag,commSizeBag,self.degreeBag)#,self.commPgRnkBag)
 
         statement = (str(evolcounter) + " evolutions and " + str(len(uniCommIds)) + " dynamic communities and " + str(commCntr)+" evolving communities" + '\n')
-        statsfile = open(self.dataset_path + "/data/results/basicstats.txt",'a')
+        statsfile = open(self.dataset_path + "/data/adaptive/results/basicstats.txt",'a')
         print(statement)
         statsfile.write(statement)
         statsfile.close()
@@ -606,7 +606,6 @@ class communityranking:
     def commRanking(self,numTopComms, prevTimeslots,xLablNum):
         import itertools, tfidf 
         # from pymongo import MongoClient
-        from pytagcloud.lang.stopwords import StopWords
         # from nltk.corpus import stopwords
         from wordcloud import  make_wordcloud
         from PIL import Image
@@ -666,27 +665,20 @@ class communityranking:
         '''Writing ranked communities to json files + MongoDB'''
         dataset_name=self.dataset_path.split('/')
         dataset_name=dataset_name[-1]
-        #Mongo--------------------
-        # client = MongoClient()
-        # db = client[dataset_name]
-        # dyccos=db.dyccos
-        #-------------------------
         rankedCommunitiesFinal = {}
-        twitterDataFile = open(self.dataset_path + '/data/results/rankedCommunities.json', "w")#, encoding="utf-8-sig")
+        twitterDataFile = open(self.dataset_path + '/data/adaptive/results/rankedCommunities.json', "w")#, encoding="utf-8-sig")
         jsondata = dict()
         jsondata["ranked_communities"] = []
 
         '''Create corpus and stopwords'''
         # stop = stopwords.words('english')
         stop = []
-        # grstopwords=pickle.load(open("./greek_stopwords.pck", 'rb'))
-        # stop.extend(grstopwords)
         definiteStop = ['gt','amp','rt','via']
         stop.extend(definiteStop)
-        if not os.path.exists(self.dataset_path + "/data/tmp/datasetCorpus.pck"):
+        if not os.path.exists(self.dataset_path + "/data/adaptive/tmp/datasetCorpus.pck"):
             idf = self.corpusExtraction(rankedCommunities[:numTopComms])
         else:
-            idf = pickle.load(open(self.dataset_path + "/data/tmp/datasetCorpus.pck", 'rb'))
+            idf = pickle.load(open(self.dataset_path + "/data/adaptive/tmp/datasetCorpus.pck", 'rb'))
             print('loaded corpus from file')
         #-------------------------
         regex1 = re.compile("(?:\@|#|https?\://)\S+",re.UNICODE)
@@ -707,8 +699,8 @@ class communityranking:
             timeSlotApp = [self.timeLimit[x] for x in uniCommIdsEvol[rcomms][0]]
 
             '''make and save wordclouds'''
-            if not os.path.exists(self.dataset_path + "/data/results/wordclouds/"+self.fileTitle+'/'+str(rank)):
-                os.makedirs(self.dataset_path + "/data/results/wordclouds/"+self.fileTitle+'/'+str(rank))
+            if not os.path.exists(self.dataset_path + "/data/adaptive/results/wordclouds/"+self.fileTitle+'/'+str(rank)):
+                os.makedirs(self.dataset_path + "/data/adaptive/results/wordclouds/"+self.fileTitle+'/'+str(rank))
 
             for tmsl, users in enumerate(uniCommIdsEvol[rcomms][3]):
                 uscentr, tmptweetText = [], []
@@ -735,13 +727,11 @@ class communityranking:
                 topicList = topicList.lower()
                 topicList = regex1.sub('', topicList)
                 topicList = regex2.findall(topicList)
-                s = StopWords()
-                s.load_language(s.guess(topicList))
                 topicList = collections.Counter(topicList)
                 tmpkeys = topicList.keys()
                 if len(topicList)>5:
                     for i in list(tmpkeys):
-                            if not i or i in stop or i.startswith(('htt','(@','t.co')) or len(i)<=2 or s.is_stop_word(i):
+                            if not i or i in stop or i.startswith(('htt','(@','t.co')) or len(i)<=2:
                                 del topicList[i]
                 else:
                     for i in list(tmpkeys):
@@ -764,11 +754,11 @@ class communityranking:
                 '''Create intermediate image'''
                 position = (rank+1)*2
                 backgroundcolor = int((1-(normedHeatdata[rank,uniCommIdsEvol[rcomms][0][tmsl]]))*255)
-                locimage = make_wordcloud(popkeys,popvals, width=width, height=height,backgroundweight=backgroundcolor)#, fname=self.dataset_path + '/data/results/wordclouds/'+self.fileTitle+'/'+str(rank)+'/'+timeSlotApp[tmsl]+'.pdf'
+                locimage = make_wordcloud(popkeys,popvals, width=width, height=height,backgroundweight=backgroundcolor)#, fname=self.dataset_path + '/data/adaptive/results/wordclouds/'+self.fileTitle+'/'+str(rank)+'/'+timeSlotApp[tmsl]+'.pdf'
                 blank_image.paste(locimage, (uniCommIdsEvol[rcomms][0][tmsl]*width,position*height))
                 popusers = [x[0] for x in uscentr[:10]]
                 popcentr = [x[1]*100 for x in uscentr[:10]]
-                locimage = make_wordcloud(popusers,popcentr, width=width, height=height,backgroundweight=backgroundcolor)#, fname=self.dataset_path + '/data/results/wordclouds/'+self.fileTitle+'/'+str(rank)+'/'+timeSlotApp[tmsl]+'usrs.pdf'
+                locimage = make_wordcloud(popusers,popcentr, width=width, height=height,backgroundweight=backgroundcolor)#, fname=self.dataset_path + '/data/adaptive/results/wordclouds/'+self.fileTitle+'/'+str(rank)+'/'+timeSlotApp[tmsl]+'usrs.pdf'
                 blank_image.paste(locimage, (uniCommIdsEvol[rcomms][0][tmsl]*width,(position+1)*height))
                 # tmpkeywrds.extend(tmpTopic)
 
@@ -792,7 +782,7 @@ class communityranking:
             # popKeywords = popKeywords.most_common(10)
             # popkeys = [x[0] for x in popKeywords]
             # popvals = [x[1] for x in popKeywords]
-            # make_wordcloud(popkeys,popvals,self.dataset_path + '/data/results/wordclouds/'+self.fileTitle+'/'+str(rank)+'.pdf')
+            # make_wordcloud(popkeys,popvals,self.dataset_path + '/data/adaptive/results/wordclouds/'+self.fileTitle+'/'+str(rank)+'.pdf')
             dycco={'community label': rcomms, 'rank': rank, 'timeslot appearance': timeSlotApp,# 'text': commTwText,
                  'persistence:': tempcommRanking[rcomms][0],'total score':commRanking[rcomms],'topic': topic,
                  'stability': tempcommRanking[rcomms][1],'community centrality': tempcommRanking[rcomms][2],
@@ -809,22 +799,19 @@ class communityranking:
             blank_image.paste(timeimage, (tmptime*width,(position+2)*height))
         imsize=blank_image.size
         blank_image = blank_image.resize((round(imsize[0]/2),round(imsize[1]/2)),Image.ANTIALIAS)
-        blank_image.save(self.dataset_path + "/data/results/wordclouds/"+self.fileTitle+'_collage.pdf', quality=50)
+        blank_image.save(self.dataset_path + "/data/adaptive/results/wordclouds/"+self.fileTitle+'_collage.pdf', quality=50)
 
         makefigures(commSizeHeatData,flux,self.fileTitle,self.day_month,commRanking,numTopComms,timeslots,uniCommIdsEvol,rankedCommunities,self.commPerTmslt,self.uniCommIds,prevTimeslots,self.dataset_path,self.xLablNum)
         return rankedCommunitiesFinal
 
     def corpusExtraction(self,rankedCommunities):
         # from nltk.corpus import stopwords
-        from pytagcloud.lang.stopwords import StopWords
         from math import log
 
         print('Extracting dataset corpus')
         uniCommIdsEvol=self.uniCommIdsEvol
 
         # stop = stopwords.words('english')
-        # grstopwords=pickle.load(open("./greek_stopwords.pck", 'rb'))
-        # stop.extend(grstopwords)
         stop = ['gt','amp','rt','via']
         textList=[]
         # cntr=0
@@ -840,10 +827,8 @@ class communityranking:
             topicList = tweets.lower()
             topicList = regex1.sub('', topicList)
             topicList = regex2.findall(topicList)
-            # s = StopWords()
-            # s.load_language(s.guess(words))
             for i in topicList:
-                if not i or i.startswith(('htt','(@','t.co')) or len(i)<=1 or i in stop:# or s.is_stop_word(i):
+                if not i or i.startswith(('htt','(@','t.co')) or len(i)<=1 or i in stop:# 
                     continue
                 else:
                     tmpTopicCC.append(i)
@@ -859,7 +844,7 @@ class communityranking:
             dictTokens[word]=log(len(fullText2)/(1+wordCount))
 
         # dictTokens['documentPopulation']=cntr
-        dictTokensPck = open(self.dataset_path + "/data/tmp/datasetCorpus.pck", "wb") # store the dictionary, for future reference
+        dictTokensPck = open(self.dataset_path + "/data/adaptive/tmp/datasetCorpus.pck", "wb") # store the dictionary, for future reference
         pickle.dump(dictTokens, dictTokensPck)
         dictTokensPck.close()
         return dictTokens
@@ -884,7 +869,7 @@ def makefigures(commSizeHeatData,flux,fileTitle,day_month,commRanking,numTopComm
     plt.tight_layout()
     fig1 = plt.gcf()
     plt.draw()
-    fig1.savefig(dataset_path + "/data/results/jaccardianFlux_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
+    fig1.savefig(dataset_path + "/data/adaptive/results/jaccardianFlux_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
     plt.close()
     del(fig1)
     print('Finished with flactuation fig')
@@ -903,7 +888,7 @@ def makefigures(commSizeHeatData,flux,fileTitle,day_month,commRanking,numTopComm
     plt.tight_layout()
     fig3 = plt.gcf()
     plt.draw()
-    fig3.savefig(dataset_path + "/data/results/commNumberFlux_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
+    fig3.savefig(dataset_path + "/data/adaptive/results/commNumberFlux_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
     plt.close()
     del(fig3)
     print('Finished with number of communities\' fluctuation fig')
@@ -934,7 +919,7 @@ def makefigures(commSizeHeatData,flux,fileTitle,day_month,commRanking,numTopComm
     mng = plt.get_current_fig_manager()
     mng.resize(*mng.window.maxsize())
     plt.show()
-    fig2.savefig(dataset_path + "/data/results/communitySizeHeatmap_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
+    fig2.savefig(dataset_path + "/data/adaptive/results/communitySizeHeatmap_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
     plt.close()
     print('Finished with heat map fig')
 
@@ -970,7 +955,7 @@ def makefigures(commSizeHeatData,flux,fileTitle,day_month,commRanking,numTopComm
     plt.tight_layout()
     fig4 = plt.gcf()
     plt.draw()
-    fig4.savefig(dataset_path + "/data/results/commCentralityFlux_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
+    fig4.savefig(dataset_path + "/data/adaptive/results/commCentralityFlux_prev" + str(prevTimeslots) + fileTitle + ".pdf",bbox_inches='tight', format='pdf')
     plt.close()
     del(fig4)
     print('Finished with community centrality fluctuation fig')
